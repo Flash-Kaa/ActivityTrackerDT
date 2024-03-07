@@ -9,21 +9,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.flasshka.activitytrackerdt.ui.theme.ActivityTrackerDTTheme
-import com.flasshka.activitytrackerdt.viewmodels.MainVM
+import com.flasshka.activitytrackerdt.viewmodels.CreateHabitVM
 
-class MainActivity : ComponentActivity() {
-    private val vm: MainVM by viewModels()
-
+class CreateHabitActivity : ComponentActivity() {
+    private val vm: CreateHabitVM by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        vm.loadFromIntent(intent, this)
 
         setContent {
             ActivityTrackerDTTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    vm.DrawerList(this)
+                    vm.Drawer(this)
                 }
             }
         }

@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">ActivityTrackerDT</string>
+    <string name="title_activity_create_habit">CreateHabitActivity</string>
+
+    <string name="habit_name">HabitNameValue</string>
+    <string name="habit_description">HabitDescriptionValue</string>
+    <string name="habit_priority">HabitPriorityValue</string>
+    <string name="habit_type">HabitTypeValue</string>
+    <string name="habit_periodicity_count">HabitPCValue</string>
+    <string name="habit_periodicity_days">HabitPDValue</string>
+    <string name="habit_colorB">HabitColorBValue</string>
+    <string name="habit_colorG">HabitColorGValue</string>
+    <string name="habit_colorR">HabitColorRValue</string>
 </resources>

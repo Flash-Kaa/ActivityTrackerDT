@@ -3,10 +3,10 @@ package com.flasshka.activitytrackerdt
 import androidx.compose.ui.graphics.Color
 
 data class Habit(
-    val name: String,
-    val description: String,
-    val priority: Int,
-    val type: HabitType,
-    val periodicity: Periodicity,
-    val color: Color
+    var name: String,
+    var description: String,
+    var priority: HabitPriority,
+    var type: HabitType,
+    var periodicity: Periodicity,
+    var color: Color
 )
