@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ActivityTrackerDT</string>
+    <string name="app_name">HabitTrackerDT</string>
     <string name="title_activity_create_habit">CreateHabitActivity</string>
 
     <string name="habit_name">HabitNameValue</string>
@@ -11,4 +11,14 @@
     <string name="habit_colorB">HabitColorBValue</string>
     <string name="habit_colorG">HabitColorGValue</string>
     <string name="habit_colorR">HabitColorRValue</string>
+    <string name="CreateOrEditHabit">Создание/редактирование привычки</string>
+    <string name="HabitName">Название</string>
+    <string name="HabitDescription">Описание</string>
+    <string name="Periodicity">Периодичность:</string>
+    <string name="PeriodicityInDays">Дней:</string>
+    <string name="PeriodicityInCount">Количество:</string>
+    <string name="HabitColor">Цвет привычки:</string>
+    <string name="HabitType">Тип привычки</string>
+    <string name="HabitPriority">Приоритет</string>
+    <string name="CreateHabit">Создай привычку</string>
 </resources>

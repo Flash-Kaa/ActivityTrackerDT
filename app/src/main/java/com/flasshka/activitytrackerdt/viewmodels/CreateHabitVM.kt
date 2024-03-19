@@ -16,7 +16,8 @@ import com.flasshka.activitytrackerdt.MainActivity
 import com.flasshka.activitytrackerdt.Periodicity
 import com.flasshka.activitytrackerdt.R
 import com.flasshka.activitytrackerdt.models.Database
-import com.flasshka.activitytrackerdt.views.CreateHabitUI
+import com.flasshka.activitytrackerdt.ui.Fields
+import com.flasshka.activitytrackerdt.ui.SaveButton
 
 class CreateHabitVM : ViewModel() {
     var name: String by mutableStateOf("")
@@ -28,14 +29,10 @@ class CreateHabitVM : ViewModel() {
     var periodicityDays: Int by mutableIntStateOf(0)
     var color: Color by mutableStateOf(Color.Black)
 
-    private val ui: CreateHabitUI by lazy {
-        CreateHabitUI(this)
-    }
-
     @Composable
     fun Drawer(activity: Activity) {
-        ui.Fields()
-        ui.SaveButton(activity)
+        Fields(this)
+        SaveButton(activity, this)
     }
 
     fun save(activity: Activity) {
