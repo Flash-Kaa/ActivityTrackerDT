@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.flasshka.activitytrackerdt.ui.HabitsList
+import com.flasshka.activitytrackerdt.ui.HabitsListWithBottomSheet
 import com.flasshka.activitytrackerdt.ui.Info
 import com.flasshka.activitytrackerdt.ui.NavigateDrawer
 import com.flasshka.activitytrackerdt.viewmodels.MainVM
@@ -28,7 +28,7 @@ fun MainNavGraph(
             Log.i("my_log", "createdNavDrawer")
 
             NavigateDrawer(navController) {
-                HabitsList(
+                HabitsListWithBottomSheet(
                     padding = it,
                     activity = activity,
                     vm = vm

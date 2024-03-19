@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
 import com.flasshka.activitytrackerdt.CreateHabitActivity
@@ -16,6 +19,8 @@ class MainVM : ViewModel() {
     val habits: List<Habit> by lazy {
         Database.habits
     }
+
+    var habitNameFilter: String by mutableStateOf("")
 
     fun toCreateActivity(activity: Activity) {
         Log.i("my_log", "vm")

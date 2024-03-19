@@ -9,17 +9,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -121,33 +126,74 @@ fun NavigateDrawer(
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HabitsList(
+fun HabitsListWithBottomSheet(
     padding: PaddingValues,
     activity: Activity,
     vm: MainVM
 ) {
-    val filtered = vm.habits.filter { it.type == habitType }
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
 
-    Column {
-        TextTabs()
-
-        if (filtered.isEmpty()) {
-            EmptyList()
-        } else {
-            LazyColumn(
-                modifier = Modifier.padding(padding)
+    BottomSheetScaffold(
+        scaffoldState = bottomSheetScaffoldState,
+        sheetBackgroundColor = colorResource(id = R.color.BottomSheetBG),
+        sheetShape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp),
+        backgroundColor = MaterialTheme.colorScheme.background,
+        sheetContent = {
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 60.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                items(filtered) { habit ->
-                    Habit(habit, activity, vm)
-                    DistanceBetweenHabits(activity)
+                androidx.compose.material3.TextField(
+                    value = vm.habitNameFilter,
+                    onValueChange = { vm.habitNameFilter = it },
+                    shape = RoundedCornerShape(15.dp),
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colorResource(id = R.color.TextField_TextColor),
+                        unfocusedTextColor = colorResource(id = R.color.TextField_TextColor),
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    label = { Text(stringResource(R.string.findByName)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = ""
+                        )
+                    }
+                )
+            }
+        },
+        floatingActionButton = { CreateButton(vm = vm, activity = activity) },
+        floatingActionButtonPosition = FabPosition.Center
+    ) {
+        val filtered = vm.habits.filter {
+            it.type == habitType && it.name.contains(vm.habitNameFilter, true)
+        }
+
+        Column {
+            TextTabs()
+
+            if (filtered.isEmpty()) {
+                EmptyList()
+            } else {
+                LazyColumn(
+                    modifier = Modifier.padding(padding)
+                ) {
+                    items(filtered) { habit ->
+                        Habit(habit, activity, vm)
+                        DistanceBetweenHabits(activity)
+                    }
                 }
             }
         }
     }
-
-    CreateButton(vm, activity)
 }
+
 
 @Composable
 fun TextTabs() {
@@ -252,16 +298,13 @@ private fun EmptyList() {
 }
 
 @Composable
-fun CreateButton(vm: MainVM, activity: Activity) {
+private fun CreateButton(vm: MainVM, activity: Activity) {
     Box(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
     ) {
         SmallFloatingActionButton(
-            modifier = Modifier.size(100.dp),
-            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier.size(80.dp),
+            shape = RoundedCornerShape(40.dp),
             onClick = { vm.toCreateActivity(activity) }
         ) {
             Icon(

@@ -248,7 +248,7 @@ private fun PriorityField(vm: CreateHabitVM) {
                 )
             },
             colors = TextFieldDefaults.colors(
-                disabledTextColor = colorResource(id = R.color.PriorityFieldText)
+                disabledTextColor = colorResource(id = R.color.TextField_TextColor)
             ),
             enabled = false
         )

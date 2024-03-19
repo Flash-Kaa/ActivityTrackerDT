@@ -8,7 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFAFA</color>
 
-    <color name="PriorityFieldText">#FF000000</color>
+    <color name="TextField_TextColor">#FF000000</color>
     <color name="HabitBG">#FFDAB9</color>
     <color name="ScaffoldBG">#E9E9E9</color>
+    <color name="BottomSheetBG">#E1E1E1</color>
 </resources>
