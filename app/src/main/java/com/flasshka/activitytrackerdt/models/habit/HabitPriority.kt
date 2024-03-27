@@ -1,4 +1,4 @@
-package com.flasshka.activitytrackerdt
+package com.flasshka.activitytrackerdt.models.habit
 
 enum class HabitPriority {
     URGENT_AND_IMPORTANT,

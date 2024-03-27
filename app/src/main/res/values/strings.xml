@@ -22,4 +22,6 @@
     <string name="HabitPriority">Приоритет</string>
     <string name="CreateHabit">Создай привычку</string>
     <string name="findByName">Найти по имени</string>
+    <string name="habit_title">Привычки</string>
+    <string name="info_title">Info</string>
 </resources>

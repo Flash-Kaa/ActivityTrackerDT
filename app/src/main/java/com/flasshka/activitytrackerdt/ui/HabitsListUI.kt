@@ -1,7 +1,5 @@
 package com.flasshka.activitytrackerdt.ui
 
-import android.app.Activity
-import android.util.DisplayMetrics
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,7 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -63,19 +64,21 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.flasshka.activitytrackerdt.Habit
-import com.flasshka.activitytrackerdt.HabitType
+import androidx.navigation.NavHostController
 import com.flasshka.activitytrackerdt.R
-import com.flasshka.activitytrackerdt.ui.navigation.MainScreens
+import com.flasshka.activitytrackerdt.models.habit.Habit
+import com.flasshka.activitytrackerdt.models.habit.HabitType
+import com.flasshka.activitytrackerdt.ui.navigation.NavScreen
 import com.flasshka.activitytrackerdt.viewmodels.MainVM
 import kotlinx.coroutines.launch
 
-
 private val prioritySize = 70.dp
 private val priorityCircleRadius = 30.dp
-private val lineBetweenHabitsOffset = 50.dp
 
 private var habitType: HabitType by mutableStateOf(HabitType.NEW_SKILL)
+
+private var habitNameFilter: String by mutableStateOf("")
+private var habitNewDateSort: Boolean by mutableStateOf(true)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,7 +133,7 @@ fun NavigateDrawer(
 @Composable
 fun HabitsListWithBottomSheet(
     padding: PaddingValues,
-    activity: Activity,
+    navControllerScreen: NavHostController,
     vm: MainVM
 ) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
@@ -140,39 +143,90 @@ fun HabitsListWithBottomSheet(
         sheetBackgroundColor = colorResource(id = R.color.BottomSheetBG),
         sheetShape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp),
         backgroundColor = MaterialTheme.colorScheme.background,
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            CreateButton(navControllerScreen = navControllerScreen)
+        },
         sheetContent = {
             Box(
                 modifier = Modifier
-                    .padding(vertical = 60.dp)
+                    .padding(top = 60.dp)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.material3.TextField(
-                    value = vm.habitNameFilter,
-                    onValueChange = { vm.habitNameFilter = it },
-                    shape = RoundedCornerShape(15.dp),
-                    singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colorResource(id = R.color.TextField_TextColor),
-                        unfocusedTextColor = colorResource(id = R.color.TextField_TextColor),
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    label = { Text(stringResource(R.string.findByName)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = ""
+                Column {
+                    androidx.compose.material3.TextField(
+                        value = habitNameFilter,
+                        onValueChange = {
+                            habitNameFilter = it
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorResource(id = R.color.TextField_TextColor),
+                            unfocusedTextColor = colorResource(id = R.color.TextField_TextColor),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        label = {
+                            Text(stringResource(R.string.findByName))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = ""
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(35.dp))
+
+                    Text(text = "Сортировать по дате:")
+
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 60.dp, top = 10.dp, end = 30.dp)
+                            .clickable {
+                                habitNewDateSort = true
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = habitNewDateSort,
+                            onClick = {
+                                habitNewDateSort = true
+                            }
+                        )
+                        Text(
+                            text = "сначала новые",
+                            textAlign = TextAlign.Center,
                         )
                     }
-                )
+
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 60.dp, bottom = 35.dp)
+                            .clickable {
+                                habitNewDateSort = false
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = !habitNewDateSort,
+                            onClick = {
+                                habitNewDateSort = false
+                            }
+                        )
+                        Text(
+                            text = "Сначала старые",
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
             }
         },
-        floatingActionButton = { CreateButton(vm = vm, activity = activity) },
-        floatingActionButtonPosition = FabPosition.Center
     ) {
         val filtered = vm.habits.filter {
-            it.type == habitType && it.name.contains(vm.habitNameFilter, true)
+            it.type == habitType && it.name.contains(habitNameFilter, true)
         }
 
         Column {
@@ -181,12 +235,10 @@ fun HabitsListWithBottomSheet(
             if (filtered.isEmpty()) {
                 EmptyList()
             } else {
-                LazyColumn(
-                    modifier = Modifier.padding(padding)
-                ) {
-                    items(filtered) { habit ->
-                        Habit(habit, activity, vm)
-                        DistanceBetweenHabits(activity)
+                LazyColumn(modifier = Modifier.padding(padding)) {
+                    items(filtered.sortedBy { if (habitNewDateSort) it.date else -it.date }) { habit ->
+                        Habit(habit, navControllerScreen)
+                        DistanceBetweenHabits()
                     }
                 }
             }
@@ -194,16 +246,13 @@ fun HabitsListWithBottomSheet(
     }
 }
 
-
 @Composable
 fun TextTabs() {
     var tabIndex: Int by remember {
         mutableIntStateOf(HabitType.entries.indexOf(habitType))
     }
 
-    TabRow(
-        selectedTabIndex = tabIndex
-    ) {
+    TabRow(selectedTabIndex = tabIndex) {
         HabitType.entries.forEachIndexed { index, itHabitType ->
             Tab(
                 selected = tabIndex == index,
@@ -234,11 +283,11 @@ private fun DrawerContent(navController: NavController) {
             fontSize = 28.sp
         )
 
-        TextButton("Привычки") {
-            navController.navigate(MainScreens.ListOfHabits.route)
+        TextButton(stringResource(R.string.habit_title)) {
+            navController.navigate(NavScreen.MainScreen.ListOfHabits.route)
         }
-        TextButton("Info") {
-            navController.navigate(MainScreens.InfoAboutApp.route)
+        TextButton(stringResource(R.string.info_title)) {
+            navController.navigate(NavScreen.MainScreen.InfoAboutApp.route)
         }
     }
 }
@@ -298,14 +347,16 @@ private fun EmptyList() {
 }
 
 @Composable
-private fun CreateButton(vm: MainVM, activity: Activity) {
+private fun CreateButton(navControllerScreen: NavHostController) {
     Box(
         contentAlignment = Alignment.BottomCenter
     ) {
         SmallFloatingActionButton(
             modifier = Modifier.size(80.dp),
             shape = RoundedCornerShape(40.dp),
-            onClick = { vm.toCreateActivity(activity) }
+            onClick = {
+                navControllerScreen.navigate(NavScreen.CreateHabitScreen.route)
+            }
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.baseline_add_120),
@@ -316,15 +367,19 @@ private fun CreateButton(vm: MainVM, activity: Activity) {
 }
 
 @Composable
-private fun Habit(habit: Habit, activity: Activity, vm: MainVM) {
+private fun Habit(
+    habit: Habit,
+    navControllerScreen: NavHostController
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp)
+            .padding(8.dp)
             .clickable {
-                vm.toCreateActivity(activity, habit)
+                navControllerScreen.navigate("${NavScreen.CreateHabitScreen.route}/${habit.id}")
             }
             .background(colorResource(id = R.color.HabitBG))
+            .padding(horizontal = 12.dp)
     ) {
         ColorDrawer(color = habit.color)
 
@@ -361,10 +416,7 @@ private fun Habit(habit: Habit, activity: Activity, vm: MainVM) {
 }
 
 @Composable
-private fun DistanceBetweenHabits(activity: Activity) {
-    val displayMetrics = DisplayMetrics()
-    activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
-
+private fun DistanceBetweenHabits() {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(15.dp)
@@ -372,17 +424,15 @@ private fun DistanceBetweenHabits(activity: Activity) {
         Canvas(modifier = Modifier) {
             drawLine(
                 color = Color.Red,
-                Offset(lineBetweenHabitsOffset.toPx(), 0f),
-                Offset(displayMetrics.widthPixels - lineBetweenHabitsOffset.toPx(), 0f)
+                Offset(Float.MIN_VALUE, 0f),
+                Offset(Float.MAX_VALUE, 0f)
             )
         }
     }
 }
 
 @Composable
-private fun ColorDrawer(
-    color: Color
-) {
+private fun ColorDrawer(color: Color) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(prioritySize)

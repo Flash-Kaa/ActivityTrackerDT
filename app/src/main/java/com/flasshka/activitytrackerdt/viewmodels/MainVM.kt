@@ -1,55 +1,25 @@
 package com.flasshka.activitytrackerdt.viewmodels
 
-import android.app.Activity
-import android.content.Intent
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.navigation.compose.rememberNavController
-import com.flasshka.activitytrackerdt.CreateHabitActivity
-import com.flasshka.activitytrackerdt.Habit
-import com.flasshka.activitytrackerdt.R
 import com.flasshka.activitytrackerdt.models.Database
-import com.flasshka.activitytrackerdt.ui.navigation.MainNavGraph
+import com.flasshka.activitytrackerdt.models.habit.Habit
 
 class MainVM : ViewModel() {
-    val habits: List<Habit> by lazy {
+    val habits: MutableList<Habit> by lazy {
         Database.habits
     }
 
-    var habitNameFilter: String by mutableStateOf("")
-
-    fun toCreateActivity(activity: Activity) {
-        Log.i("my_log", "vm")
-        Intent(activity, CreateHabitActivity::class.java).apply {
-            activity.startActivity(this)
+    fun addOrUpdate(habit: Habit) {
+        val filterById = habits.filter { x ->
+            x.id == habit.id
         }
-    }
 
-    fun toCreateActivity(activity: Activity, habit: Habit) {
-        Database.habits.remove(habit)
-
-        Intent(activity, CreateHabitActivity::class.java).apply {
-            putExtra(activity.getString(R.string.habit_name), habit.name)
-            putExtra(activity.getString(R.string.habit_description), habit.description)
-            putExtra(activity.getString(R.string.habit_priority), habit.priority.name)
-            putExtra(activity.getString(R.string.habit_type), habit.type.name)
-            putExtra(activity.getString(R.string.habit_colorB), habit.color.blue)
-            putExtra(activity.getString(R.string.habit_colorR), habit.color.red)
-            putExtra(activity.getString(R.string.habit_colorG), habit.color.green)
-            putExtra(activity.getString(R.string.habit_periodicity_count), habit.periodicity.count)
-            putExtra(activity.getString(R.string.habit_periodicity_days), habit.periodicity.days)
-
-            activity.startActivity(this)
+        if (filterById.isNotEmpty()) {
+            Database.habits.remove(filterById.first())
         }
-    }
 
-    @Composable
-    fun Navigation(activity: Activity) {
-        val navController = rememberNavController()
-        MainNavGraph(navController = navController, activity = activity, vm = this)
+        val id = if (habits.isEmpty()) 0 else Database.habits.last().id + 1
+
+        Database.habits.add(habit.copy(id = id))
     }
 }

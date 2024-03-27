@@ -1,6 +1,5 @@
 package com.flasshka.activitytrackerdt.ui
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,6 +26,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,15 +42,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.flasshka.activitytrackerdt.HabitPriority
-import com.flasshka.activitytrackerdt.HabitType
+import androidx.navigation.NavController
 import com.flasshka.activitytrackerdt.R
-import com.flasshka.activitytrackerdt.viewmodels.CreateHabitVM
+import com.flasshka.activitytrackerdt.models.habit.Habit
+import com.flasshka.activitytrackerdt.models.habit.HabitPeriodicity
+import com.flasshka.activitytrackerdt.models.habit.HabitPriority
+import com.flasshka.activitytrackerdt.models.habit.HabitType
+import com.flasshka.activitytrackerdt.ui.navigation.NavScreen
+import com.flasshka.activitytrackerdt.viewmodels.MainVM
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 private var closeButtonEnabled: Boolean by mutableStateOf(false)
 
-private fun closeButtonEnabled(vm: CreateHabitVM) =
-    vm.name.length >= 3 && vm.periodicityDays > 0 && vm.periodicityCount > 0
+private var name: String by mutableStateOf("")
+private var description: String by mutableStateOf("")
+private var priority: HabitPriority by mutableStateOf(HabitPriority.URGENT_AND_IMPORTANT)
+private var type: HabitType by mutableStateOf(HabitType.NEW_SKILL)
+
+private var periodicityCount: Int by mutableIntStateOf(0)
+private var periodicityDays: Int by mutableIntStateOf(0)
+private var color: Color by mutableStateOf(Color.Black)
+
+private var id: Long by mutableLongStateOf(-1L)
 
 private val allowedColorList = listOf(
     Color.Black,
@@ -70,9 +85,47 @@ private val allowedColorList = listOf(
     Color(0, 0, 128)
 )
 
+private fun closeButtonEnabled() =
+    name.length >= 3 && periodicityDays > 0 && periodicityCount > 0
+
+private var lastChangeId: Long? = null
+
 @Composable
-fun Fields(vm: CreateHabitVM) {
-    closeButtonEnabled = closeButtonEnabled(vm)
+fun CreateHabitUI(
+    vm: MainVM,
+    navController: NavController,
+    habitIdToChange: Long? = null
+) {
+    if (habitIdToChange != lastChangeId) {
+        lastChangeId = habitIdToChange
+
+        id = -1L
+        name = ""
+        description = ""
+        priority = HabitPriority.URGENT_AND_IMPORTANT
+        type = HabitType.NEW_SKILL
+        periodicityCount = 0
+        periodicityDays = 0
+        color = Color.Black
+
+        habitIdToChange?.let { longId ->
+
+            id = longId
+
+            vm.habits.first { it.id == longId }
+                .also {
+                    name = it.name
+                    description = it.description
+                    priority = it.priority
+                    type = it.type
+                    periodicityCount = it.periodicity.count
+                    periodicityDays = it.periodicity.days
+                    color = it.color
+                }
+        }
+    }
+
+    closeButtonEnabled = closeButtonEnabled()
 
     Column(
         modifier = Modifier.padding(10.dp),
@@ -91,11 +144,11 @@ fun Fields(vm: CreateHabitVM) {
         }
 
         TextField(
-            value = vm.name,
+            value = name,
             onValueChange = {
-                vm.name = it
-                closeButtonEnabled = closeButtonEnabled(vm)
-                isError = vm.name.length < 3
+                name = it
+                closeButtonEnabled = closeButtonEnabled()
+                isError = name.length < 3
             },
             label = { Text(stringResource(R.string.HabitName)) },
             colors = TextFieldDefaults.colors(errorContainerColor = Color.Red),
@@ -106,9 +159,13 @@ fun Fields(vm: CreateHabitVM) {
         )
 
         TextField(
-            value = vm.description,
-            label = { Text(stringResource(R.string.HabitDescription)) },
-            onValueChange = { vm.description = it },
+            value = description,
+            label = {
+                Text(stringResource(R.string.HabitDescription))
+            },
+            onValueChange = {
+                description = it
+            },
             singleLine = false,
             modifier = Modifier
                 .height(100.dp)
@@ -123,42 +180,45 @@ fun Fields(vm: CreateHabitVM) {
 
         Row {
             PeriodicityField(
-                vm = vm,
                 text = stringResource(R.string.PeriodicityInDays),
-                getValue = { vm.periodicityDays }
+                getValue = { periodicityDays }
             ) {
-                vm.periodicityDays = it
+                periodicityDays = it
             }
 
             PeriodicityField(
-                vm = vm,
                 text = stringResource(R.string.PeriodicityInCount),
-                getValue = { vm.periodicityCount }
+                getValue = { periodicityCount }
             ) {
-                vm.periodicityCount = it
+                periodicityCount = it
             }
         }
 
-        PriorityField(vm)
+        PriorityField()
 
         Text(
             text = stringResource(R.string.HabitColor),
             modifier = Modifier.padding(top = 20.dp)
         )
 
-        ColorChooser(vm)
+        ColorChooser()
 
         Text(
             text = stringResource(R.string.HabitType),
             modifier = Modifier.padding(top = 20.dp)
         )
 
-        TypeButtons(vm)
+        TypeButtons()
     }
+
+    SaveButton(vm, navController)
 }
 
 @Composable
-fun SaveButton(activity: Activity, vm: CreateHabitVM) {
+private fun SaveButton(
+    vm: MainVM,
+    navController: NavController
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
@@ -168,7 +228,25 @@ fun SaveButton(activity: Activity, vm: CreateHabitVM) {
                 .padding(10.dp)
                 .size(80.dp),
             shape = RoundedCornerShape(40.dp),
-            onClick = { vm.save(activity) },
+            onClick = {
+                val habit = Habit(
+                    id, name, description, priority, type,
+                    HabitPeriodicity(periodicityCount, periodicityDays), color,
+                    LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+                )
+
+                id = -1L
+                name = ""
+                description = ""
+                priority = HabitPriority.URGENT_AND_IMPORTANT
+                type = HabitType.NEW_SKILL
+                periodicityCount = 0
+                periodicityDays = 0
+                color = Color.Black
+
+                vm.addOrUpdate(habit)
+                navController.navigate(NavScreen.MainScreen.route)
+            },
             enabled = closeButtonEnabled
         ) {
             Icon(
@@ -182,7 +260,6 @@ fun SaveButton(activity: Activity, vm: CreateHabitVM) {
 
 @Composable
 private fun PeriodicityField(
-    vm: CreateHabitVM,
     text: String,
     getValue: () -> Int,
     setValue: (Int) -> Unit,
@@ -209,7 +286,7 @@ private fun PeriodicityField(
                 true
             }
 
-            closeButtonEnabled = closeButtonEnabled(vm)
+            closeButtonEnabled = closeButtonEnabled()
             periodicity = it
         },
         modifier = Modifier
@@ -224,9 +301,9 @@ private fun PeriodicityField(
 }
 
 @Composable
-private fun PriorityField(vm: CreateHabitVM) {
+private fun PriorityField() {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(vm.priority.toString()) }
+    var selectedOption by remember { mutableStateOf(priority.toString()) }
 
     Box {
         TextField(
@@ -264,7 +341,7 @@ private fun PriorityField(vm: CreateHabitVM) {
                     },
                     onClick = {
                         selectedOption = it.toString()
-                        vm.priority = it
+                        priority = it
                         expanded = false
                     }
                 )
@@ -274,17 +351,17 @@ private fun PriorityField(vm: CreateHabitVM) {
 }
 
 @Composable
-private fun TypeButtons(vm: CreateHabitVM) {
+private fun TypeButtons() {
     HabitType.entries.forEach {
         Row(
             modifier = Modifier
-                .clickable { vm.type = it }
+                .clickable { type = it }
                 .size(width = 200.dp, height = 40.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(
-                selected = vm.type == it,
-                onClick = { vm.type = it }
+                selected = type == it,
+                onClick = { type = it }
             )
 
             Text(
@@ -296,11 +373,7 @@ private fun TypeButtons(vm: CreateHabitVM) {
 }
 
 @Composable
-private fun ColorChooser(vm: CreateHabitVM) {
-    var color: Color by remember {
-        mutableStateOf(vm.color)
-    }
-
+private fun ColorChooser() {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -313,7 +386,6 @@ private fun ColorChooser(vm: CreateHabitVM) {
                     .background(it)
                     .clickable {
                         color = it
-                        vm.color = it
                     }
                     .size(40.dp)
             ) {

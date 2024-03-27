@@ -1,4 +1,4 @@
-package com.flasshka.activitytrackerdt
+package com.flasshka.activitytrackerdt.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,22 +8,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.flasshka.activitytrackerdt.ui.navigation.MainNavGraph
 import com.flasshka.activitytrackerdt.ui.theme.ActivityTrackerDTTheme
-import com.flasshka.activitytrackerdt.viewmodels.CreateHabitVM
+import com.flasshka.activitytrackerdt.viewmodels.MainVM
 
-class CreateHabitActivity : ComponentActivity() {
-    private val vm: CreateHabitVM by viewModels()
+class MainActivity : ComponentActivity() {
+    private val vm: MainVM by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        vm.loadFromIntent(intent, this)
-
         setContent {
             ActivityTrackerDTTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    vm.Drawer(this)
+                    MainNavGraph(vm)
                 }
             }
         }

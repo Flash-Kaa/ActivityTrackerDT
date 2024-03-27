@@ -1,6 +1,6 @@
 package com.flasshka.activitytrackerdt.models
 
-import com.flasshka.activitytrackerdt.Habit
+import com.flasshka.activitytrackerdt.models.habit.Habit
 
 
 // It will be replaced by Room

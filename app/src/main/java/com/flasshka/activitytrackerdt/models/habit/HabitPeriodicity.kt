@@ -1,6 +1,6 @@
-package com.flasshka.activitytrackerdt
+package com.flasshka.activitytrackerdt.models.habit
 
-data class Periodicity(
+data class HabitPeriodicity(
     val count: Int,
     val days: Int
 ) {
