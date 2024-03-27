@@ -24,4 +24,7 @@
     <string name="findByName">Найти по имени</string>
     <string name="habit_title">Привычки</string>
     <string name="info_title">Info</string>
+    <string name="sortByDate">Сортировать по дате:</string>
+    <string name="sortByNewDate">Cначала новые</string>
+    <string name="sortByOldestDate">Сначала старые</string>
 </resources>

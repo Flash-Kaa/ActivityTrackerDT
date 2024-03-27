@@ -180,7 +180,7 @@ fun HabitsListWithBottomSheet(
                     )
                     Spacer(modifier = Modifier.height(35.dp))
 
-                    Text(text = "Сортировать по дате:")
+                    Text(text = stringResource(R.string.sortByDate))
 
                     Row(
                         modifier = Modifier
@@ -197,7 +197,7 @@ fun HabitsListWithBottomSheet(
                             }
                         )
                         Text(
-                            text = "сначала новые",
+                            text = stringResource(R.string.sortByNewDate),
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -217,7 +217,7 @@ fun HabitsListWithBottomSheet(
                             }
                         )
                         Text(
-                            text = "Сначала старые",
+                            text = stringResource(R.string.sortByOldestDate),
                             textAlign = TextAlign.Center,
                         )
                     }
