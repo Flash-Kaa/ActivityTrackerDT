@@ -1,4 +1,4 @@
-package com.flasshka.activitytrackerdt.ui
+package com.flasshka.activitytrackerdt.ui.creating
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,8 +26,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,70 +42,60 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.flasshka.activitytrackerdt.R
-import com.flasshka.activitytrackerdt.models.habit.Habit
-import com.flasshka.activitytrackerdt.models.habit.HabitPeriodicity
 import com.flasshka.activitytrackerdt.models.habit.HabitPriority
 import com.flasshka.activitytrackerdt.models.habit.HabitType
-import com.flasshka.activitytrackerdt.ui.navigation.NavScreen
-import com.flasshka.activitytrackerdt.viewmodels.MainVM
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-
-private var closeButtonEnabled: Boolean by mutableStateOf(false)
-
-private var name: String by mutableStateOf("")
-private var description: String by mutableStateOf("")
-private var priority: HabitPriority by mutableStateOf(HabitPriority.URGENT_AND_IMPORTANT)
-private var type: HabitType by mutableStateOf(HabitType.NEW_SKILL)
-
-private var periodicityCount: Int by mutableIntStateOf(0)
-private var periodicityDays: Int by mutableIntStateOf(0)
-private var color: Color by mutableStateOf(Color.Black)
-
-private var id: Long by mutableLongStateOf(-1L)
-
-private val allowedColorList = listOf(
-    Color.Black,
-    Color.Gray,
-    Color(192, 192, 192),
-    Color.White,
-    Color(255, 0, 255),
-    Color(128, 0, 128),
-    Color.Red,
-    Color(128, 0, 0),
-    Color.Yellow,
-    Color(128, 128, 0),
-    Color(0, 255, 0),
-    Color(0, 128, 0),
-    Color(0, 255, 255),
-    Color(0, 128, 128),
-    Color.Blue,
-    Color(0, 0, 128)
-)
-
-private fun closeButtonEnabled() =
-    name.length >= 3 && periodicityDays > 0 && periodicityCount > 0
-
-private var lastChangeId: Long? = null
 
 @Composable
-fun CreateHabitUI(
-    vm: MainVM,
+fun DrawCreateHabitUI(
+    vm: CreateHabitVM,
     navController: NavController,
     habitIdToChange: Long? = null
 ) {
-    if (habitIdToChange != lastChangeId) {
-        lastChangeId = habitIdToChange
+    CreateHabitUI(
+        getHabitState = vm.getHabitStateAction(habitIdToChange),
+        getNameIsCorrect = vm.getNameIsCorrectAction(),
+        getPeriodicityCountIsCorrect = vm.getPeriodicityCountIsCorrectAction(),
+        getPeriodicityDaysCountIsCorrect = vm.getPeriodicityDaysCountIsCorrectAction(),
+        getAllowedColor = vm.getAllowedColorAction(),
+        getSaveButtonIsEnabled = vm.getSaveButtonIsEnabled(),
+        onNameChange = vm.getOnNameChangeAction(),
+        onDescriptionChange = vm.getOnDescriptionChangeAction(),
+        onPriorityChange = vm.getOnPriorityChangeAction(),
+        onPeriodicityCountChange = vm.getOnPeriodicityCountIsCorrectAction(),
+        onPeriodicityDaysCountChange = vm.getOnPeriodicityDaysCountIsCorrectAction(),
+        onTypeChange = vm.getOnTypeChangeAction(),
+        onColorChange = vm.getOnColorChangeAction(),
+        onSaveHabit = vm.getOnSaveHabitAction(navController)
+    )
+}
 
-        id = -1L
+@Composable
+private fun CreateHabitUI(
+    getHabitState: () -> CreateHabitState,
+    getNameIsCorrect: () -> Boolean,
+    getPeriodicityCountIsCorrect: () -> Boolean,
+    getPeriodicityDaysCountIsCorrect: () -> Boolean,
+    getAllowedColor: () -> List<Color>,
+    getSaveButtonIsEnabled: () -> Boolean,
+    onNameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onPriorityChange: (HabitPriority) -> Unit,
+    onPeriodicityCountChange: (String) -> Unit,
+    onPeriodicityDaysCountChange: (String) -> Unit,
+    onTypeChange: (HabitType) -> Unit,
+    onColorChange: (Color) -> Unit,
+    onSaveHabit: () -> Unit
+) {
+    /*if (id != habitIdToChange) {
+
+        id = habitIdToChange ?: (vm.habits.maxOf { it.id } + 1)
         name = ""
         description = ""
         priority = HabitPriority.URGENT_AND_IMPORTANT
-        type = HabitType.NEW_SKILL
+        type = HabitType.BAD
         periodicityCount = 0
         periodicityDays = 0
         color = Color.Black
-
         habitIdToChange?.let { longId ->
 
             id = longId
@@ -123,9 +111,7 @@ fun CreateHabitUI(
                     color = it.color
                 }
         }
-    }
-
-    closeButtonEnabled = closeButtonEnabled()
+    }*/
 
     Column(
         modifier = Modifier.padding(10.dp),
@@ -139,33 +125,23 @@ fun CreateHabitUI(
             fontSize = 28.sp
         )
 
-        var isError: Boolean by remember {
-            mutableStateOf(false)
-        }
-
         TextField(
-            value = name,
-            onValueChange = {
-                name = it
-                closeButtonEnabled = closeButtonEnabled()
-                isError = name.length < 3
-            },
+            value = getHabitState().name,
+            onValueChange = onNameChange,
             label = { Text(stringResource(R.string.HabitName)) },
             colors = TextFieldDefaults.colors(errorContainerColor = Color.Red),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 10.dp),
-            isError = isError
+            isError = !getNameIsCorrect()
         )
 
         TextField(
-            value = description,
+            value = getHabitState().description,
             label = {
                 Text(stringResource(R.string.HabitDescription))
             },
-            onValueChange = {
-                description = it
-            },
+            onValueChange = onDescriptionChange,
             singleLine = false,
             modifier = Modifier
                 .height(100.dp)
@@ -181,43 +157,56 @@ fun CreateHabitUI(
         Row {
             PeriodicityField(
                 text = stringResource(R.string.PeriodicityInDays),
-                getValue = { periodicityDays }
-            ) {
-                periodicityDays = it
-            }
+                getValue = { getHabitState().periodicityDaysCount },
+                onPeriodicityChange = onPeriodicityDaysCountChange,
+                isCorrect = getPeriodicityDaysCountIsCorrect
+            )
 
             PeriodicityField(
                 text = stringResource(R.string.PeriodicityInCount),
-                getValue = { periodicityCount }
-            ) {
-                periodicityCount = it
-            }
+                getValue = { getHabitState().periodicityCount },
+                onPeriodicityChange = onPeriodicityCountChange,
+                isCorrect = getPeriodicityCountIsCorrect
+            )
         }
 
-        PriorityField()
+        PriorityField(
+            getHabitState = getHabitState,
+            onPriorityChange = onPriorityChange
+        )
 
         Text(
             text = stringResource(R.string.HabitColor),
             modifier = Modifier.padding(top = 20.dp)
         )
 
-        ColorChooser()
+        ColorChooser(
+            getHabitState = getHabitState,
+            getAllowedColor = getAllowedColor,
+            onColorChange = onColorChange
+        )
 
         Text(
             text = stringResource(R.string.HabitType),
             modifier = Modifier.padding(top = 20.dp)
         )
 
-        TypeButtons()
+        TypeButtons(
+            getHabitState = getHabitState,
+            onTypeChange = onTypeChange
+        )
     }
 
-    SaveButton(vm, navController)
+    SaveButton(
+        getSaveButtonIsEnabled = getSaveButtonIsEnabled,
+        onSaveHabit = onSaveHabit
+    )
 }
 
 @Composable
 private fun SaveButton(
-    vm: MainVM,
-    navController: NavController
+    getSaveButtonIsEnabled: () -> Boolean,
+    onSaveHabit: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -228,26 +217,8 @@ private fun SaveButton(
                 .padding(10.dp)
                 .size(80.dp),
             shape = RoundedCornerShape(40.dp),
-            onClick = {
-                val habit = Habit(
-                    id, name, description, priority, type,
-                    HabitPeriodicity(periodicityCount, periodicityDays), color,
-                    LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-                )
-
-                id = -1L
-                name = ""
-                description = ""
-                priority = HabitPriority.URGENT_AND_IMPORTANT
-                type = HabitType.NEW_SKILL
-                periodicityCount = 0
-                periodicityDays = 0
-                color = Color.Black
-
-                vm.addOrUpdate(habit)
-                navController.navigate(NavScreen.MainScreen.route)
-            },
-            enabled = closeButtonEnabled
+            onClick = onSaveHabit,
+            enabled = getSaveButtonIsEnabled()
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.round_done_36),
@@ -261,38 +232,18 @@ private fun SaveButton(
 @Composable
 private fun PeriodicityField(
     text: String,
-    getValue: () -> Int,
-    setValue: (Int) -> Unit,
+    getValue: () -> String,
+    onPeriodicityChange: (String) -> Unit,
+    isCorrect: () -> Boolean
 ) {
-    var error: Boolean by remember {
-        mutableStateOf(false)
-    }
-
-    var periodicity: String by remember {
-        val value = getValue()
-        mutableStateOf(if (value > 0) value.toString() else "")
-    }
-
     TextField(
-        value = periodicity,
+        value = getValue(),
         label = { Text(text) },
-        onValueChange = {
-            val toInt = it.toIntOrNull()
-
-            error = if (toInt != null && toInt > 0) {
-                setValue(toInt)
-                false
-            } else {
-                true
-            }
-
-            closeButtonEnabled = closeButtonEnabled()
-            periodicity = it
-        },
+        onValueChange = onPeriodicityChange,
         modifier = Modifier
             .padding(10.dp)
             .width(150.dp),
-        isError = error,
+        isError = !isCorrect(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         ),
@@ -301,13 +252,15 @@ private fun PeriodicityField(
 }
 
 @Composable
-private fun PriorityField() {
+private fun PriorityField(
+    getHabitState: () -> CreateHabitState,
+    onPriorityChange: (HabitPriority) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(priority.toString()) }
 
     Box {
         TextField(
-            value = selectedOption,
+            value = getHabitState().priority.name,
             onValueChange = {},
             modifier = Modifier
                 .padding(top = 15.dp)
@@ -340,8 +293,7 @@ private fun PriorityField() {
                         Text(text = it.toString())
                     },
                     onClick = {
-                        selectedOption = it.toString()
-                        priority = it
+                        onPriorityChange(it)
                         expanded = false
                     }
                 )
@@ -351,17 +303,20 @@ private fun PriorityField() {
 }
 
 @Composable
-private fun TypeButtons() {
+private fun TypeButtons(
+    getHabitState: () -> CreateHabitState,
+    onTypeChange: (HabitType) -> Unit
+) {
     HabitType.entries.forEach {
         Row(
             modifier = Modifier
-                .clickable { type = it }
+                .clickable { onTypeChange(it) }
                 .size(width = 200.dp, height = 40.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(
-                selected = type == it,
-                onClick = { type = it }
+                selected = getHabitState().type == it,
+                onClick = { onTypeChange(it) }
             )
 
             Text(
@@ -373,23 +328,25 @@ private fun TypeButtons() {
 }
 
 @Composable
-private fun ColorChooser() {
+private fun ColorChooser(
+    getHabitState: () -> CreateHabitState,
+    getAllowedColor: () -> List<Color>,
+    onColorChange: (Color) -> Unit
+) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 15.dp)
     ) {
-        items(allowedColorList) {
+        items(getAllowedColor()) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .background(it)
-                    .clickable {
-                        color = it
-                    }
+                    .clickable { onColorChange(it) }
                     .size(40.dp)
             ) {
-                if (it == color) {
+                if (it == getHabitState().color) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.round_done_36),
                         tint = Color(75, 0, 130),
@@ -398,9 +355,7 @@ private fun ColorChooser() {
                 }
             }
 
-            Spacer(
-                modifier = Modifier.width(20.dp)
-            )
+            Spacer(modifier = Modifier.width(20.dp))
         }
     }
 }

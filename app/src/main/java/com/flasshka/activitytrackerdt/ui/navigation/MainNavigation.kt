@@ -7,49 +7,52 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.flasshka.activitytrackerdt.ui.CreateHabitUI
-import com.flasshka.activitytrackerdt.ui.HabitsListWithBottomSheet
 import com.flasshka.activitytrackerdt.ui.Info
-import com.flasshka.activitytrackerdt.ui.NavigateDrawer
-import com.flasshka.activitytrackerdt.viewmodels.MainVM
-
-private var curMainScreen: NavScreen = NavScreen.MainScreen.ListOfHabits
-private var curScreen: NavScreen = NavScreen.MainScreen
+import com.flasshka.activitytrackerdt.ui.MainVM
+import com.flasshka.activitytrackerdt.ui.creating.CreateHabitVM
+import com.flasshka.activitytrackerdt.ui.creating.DrawCreateHabitUI
+import com.flasshka.activitytrackerdt.ui.habits.DrawerHabitsListWithBottomSheet
+import com.flasshka.activitytrackerdt.ui.habits.DrawerSideBar
 
 @Composable
-fun MainNavGraph(vm: MainVM) {
+fun MainNavGraph(
+    mainVM: MainVM,
+    createVM: CreateHabitVM
+) {
     val navControllerScreen = rememberNavController()
 
     NavHost(
         navController = navControllerScreen,
-        startDestination = curScreen.route
+        startDestination = NavScreen.MainScreen.route
     ) {
-
         composable(NavScreen.MainScreen.route) {
-            curScreen = NavScreen.MainScreen
             MainScreenNavigation(
                 navControllerScreen = navControllerScreen,
-                vm = vm
+                vm = mainVM
             )
         }
 
         composable(NavScreen.CreateHabitScreen.route) {
-            curScreen = NavScreen.CreateHabitScreen
-
-            CreateHabitUI(vm, navControllerScreen, null)
+            DrawCreateHabitUI(
+                vm = createVM,
+                navController = navControllerScreen
+            )
         }
 
         composable(
-            route = "${NavScreen.CreateHabitScreen.route}/{item}",
-            arguments = listOf(navArgument("item") {
-                type = NavType.StringType
-            })
+            route = "${NavScreen.CreateHabitScreen.route}/{itemId}",
+            arguments = listOf(
+                navArgument("itemId") {
+                    type = NavType.LongType
+                }
+            )
         ) {
-            curScreen = NavScreen.CreateHabitScreen
-
-            val id = it.arguments?.getString("item")?.toLong()
-
-            CreateHabitUI(vm, navControllerScreen, id)
+            val id = it.arguments?.getLong("itemId")
+            DrawCreateHabitUI(
+                vm = createVM,
+                navController = navControllerScreen,
+                habitIdToChange = id
+            )
         }
     }
 }
@@ -61,23 +64,23 @@ private fun MainScreenNavigation(
 ) {
     val navControllerMainScreen = rememberNavController()
 
-    NavigateDrawer(navControllerMainScreen) { padding ->
+    DrawerSideBar(
+        vm = vm,
+        navController = navControllerMainScreen,
+    ) { padding ->
         NavHost(
             navController = navControllerMainScreen,
-            startDestination = curMainScreen.route
+            startDestination = NavScreen.MainScreen.ListOfHabits.route
         ) {
             composable(NavScreen.MainScreen.ListOfHabits.route) {
-                curMainScreen = NavScreen.MainScreen.ListOfHabits
-
-                HabitsListWithBottomSheet(
+                DrawerHabitsListWithBottomSheet(
                     padding = padding,
-                    navControllerScreen = navControllerScreen,
+                    navController = navControllerScreen,
                     vm = vm
                 )
             }
 
             composable(route = NavScreen.MainScreen.InfoAboutApp.route) {
-                curMainScreen = NavScreen.MainScreen.InfoAboutApp
                 Info()
             }
         }
