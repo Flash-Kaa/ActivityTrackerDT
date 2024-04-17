@@ -1,10 +1,12 @@
 package com.flasshka.activitytrackerdt.ui
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -17,9 +19,9 @@ import com.flasshka.activitytrackerdt.ui.navigation.NavScreen
 import kotlinx.coroutines.launch
 
 class MainVM : ViewModel() {
-    var habits: List<Habit> by mutableStateOf(listOf())
-
     private lateinit var repository: Repository;
+
+    private var habits = MutableLiveData<MutableState<List<Habit>>>(mutableStateOf(listOf()))
 
     private var habitNameFilter: String by mutableStateOf("")
     private var indexChosenFilterByHabitType: Int by mutableIntStateOf(0)
@@ -34,18 +36,31 @@ class MainVM : ViewModel() {
         )
 
         viewModelScope.launch {
-            habits = repository.getAll().toMutableList()
+            repository.getAllWithLiveData().observeForever {
+                habits.value?.value = it.map { entity -> entity.toHabit() }
+            }
         }
     }
+
+    fun getNextIndex(): Long {
+        return habits.value?.value?.let {
+            if (it.isEmpty()) null
+            else it.maxOf { h -> h.id } + 1L
+        } ?: 0L
+    }
+
+    fun getFirstOrNullWithId(id: Long): Habit? = habits.value?.value?.firstOrNull { it.id == id }
 
     fun getSortedAndFilteredHabitList(): () -> List<Habit> = {
         val chosenFilterByHabitType = HabitType.entries[indexChosenFilterByHabitType]
 
-        habits.filter {
-            it.type == chosenFilterByHabitType && it.name.contains(habitNameFilter, true)
-        }.sortedBy {
-            if (sortHabitsByDateFromNew) it.date else -it.date
-        }
+        habits.value?.value?.let { list ->
+            list.filter {
+                it.type == chosenFilterByHabitType && it.name.contains(habitNameFilter, true)
+            }.sortedBy {
+                if (sortHabitsByDateFromNew) it.date else -it.date
+            }
+        } ?: emptyList()
     }
 
     fun getCurrentValueHabitNameFilter(): () -> String = { habitNameFilter }
@@ -80,13 +95,11 @@ class MainVM : ViewModel() {
 
     fun addOrUpdate(habit: Habit) {
         viewModelScope.launch {
-            if (habits.any { x -> x.id == habit.id }) {
+            if (habits.value?.value?.any { x -> x.id == habit.id } == true) {
                 repository.update(habit)
             } else {
                 repository.addHabit(habit)
             }
-
-            habits = repository.getAll()
         }
     }
 }

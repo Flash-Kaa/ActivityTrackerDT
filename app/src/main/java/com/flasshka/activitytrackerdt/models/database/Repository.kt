@@ -1,6 +1,7 @@
 package com.flasshka.activitytrackerdt.models.database
 
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.LiveData
 import com.flasshka.activitytrackerdt.models.database.HabitEntity.Companion.toEntity
 import com.flasshka.activitytrackerdt.models.habit.Habit
 import kotlinx.coroutines.Dispatchers
@@ -40,4 +41,6 @@ class Repository(private val dao: Dao) {
     suspend fun getAll() = withContext(Dispatchers.IO) {
         return@withContext dao.getHabits().map { it.toHabit() }
     }
+
+    fun getAllWithLiveData(): LiveData<List<HabitEntity>> = dao.getHabitsWithLiveData()
 }

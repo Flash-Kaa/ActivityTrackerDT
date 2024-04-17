@@ -18,13 +18,15 @@
     <string name="PeriodicityInDays">Дней:</string>
     <string name="PeriodicityInCount">Количество:</string>
     <string name="HabitColor">Цвет привычки:</string>
-    <string name="HabitType">Тип привычки</string>
-    <string name="HabitPriority">Приоритет</string>
+    <string name="HabitType">Тип привычки: %1$s</string>
+    <string name="HabitPriority">Приоритет: %1$s</string>
+    <string name="InBrackets">(%1$s)</string>
     <string name="CreateHabit">Создай привычку</string>
-    <string name="findByName">Найти по имени</string>
-    <string name="habit_title">Привычки</string>
-    <string name="info_title">Info</string>
-    <string name="sortByDate">Сортировать по дате:</string>
-    <string name="sortByNewDate">Cначала новые</string>
-    <string name="sortByOldestDate">Сначала старые</string>
+    <string name="ChoseHabitType">Тип привычки:</string>
+    <string name="FindByName">Найти по имени</string>
+    <string name="Habit_title">Привычки</string>
+    <string name="Info_title">Info</string>
+    <string name="SortByDate">Сортировать по дате:</string>
+    <string name="SortByNewDate">Cначала новые</string>
+    <string name="SortByOldestDate">Сначала старые</string>
 </resources>

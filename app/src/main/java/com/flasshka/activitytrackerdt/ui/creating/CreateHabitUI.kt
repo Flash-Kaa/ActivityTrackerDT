@@ -86,109 +86,39 @@ private fun CreateHabitUI(
     onColorChange: (Color) -> Unit,
     onSaveHabit: () -> Unit
 ) {
-    /*if (id != habitIdToChange) {
-
-        id = habitIdToChange ?: (vm.habits.maxOf { it.id } + 1)
-        name = ""
-        description = ""
-        priority = HabitPriority.URGENT_AND_IMPORTANT
-        type = HabitType.BAD
-        periodicityCount = 0
-        periodicityDays = 0
-        color = Color.Black
-        habitIdToChange?.let { longId ->
-
-            id = longId
-
-            vm.habits.first { it.id == longId }
-                .also {
-                    name = it.name
-                    description = it.description
-                    priority = it.priority
-                    type = it.type
-                    periodicityCount = it.periodicity.count
-                    periodicityDays = it.periodicity.days
-                    color = it.color
-                }
-        }
-    }*/
-
     Column(
         modifier = Modifier.padding(10.dp),
     ) {
-        Text(
-            text = stringResource(R.string.CreateOrEditHabit),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 15.dp),
-            fontSize = 28.sp
+        Title()
+
+        NameField(
+            getHabitState = getHabitState,
+            getNameIsCorrect = getNameIsCorrect,
+            onNameChange = onNameChange
         )
 
-        TextField(
-            value = getHabitState().name,
-            onValueChange = onNameChange,
-            label = { Text(stringResource(R.string.HabitName)) },
-            colors = TextFieldDefaults.colors(errorContainerColor = Color.Red),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            isError = !getNameIsCorrect()
+        DescriptionField(
+            getHabitState = getHabitState,
+            onDescriptionChange = onDescriptionChange
         )
 
-        TextField(
-            value = getHabitState().description,
-            label = {
-                Text(stringResource(R.string.HabitDescription))
-            },
-            onValueChange = onDescriptionChange,
-            singleLine = false,
-            modifier = Modifier
-                .height(100.dp)
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
+        PeriodicityFields(
+            getHabitState = getHabitState,
+            getPeriodicityCountIsCorrect = getPeriodicityCountIsCorrect,
+            getPeriodicityDaysCountIsCorrect = getPeriodicityDaysCountIsCorrect,
+            onPeriodicityCountChange = onPeriodicityCountChange,
+            onPeriodicityDaysCountChange = onPeriodicityDaysCountChange
         )
-
-        Text(
-            text = stringResource(R.string.Periodicity),
-            modifier = Modifier.padding(top = 15.dp)
-        )
-
-        Row {
-            PeriodicityField(
-                text = stringResource(R.string.PeriodicityInDays),
-                getValue = { getHabitState().periodicityDaysCount },
-                onPeriodicityChange = onPeriodicityDaysCountChange,
-                isCorrect = getPeriodicityDaysCountIsCorrect
-            )
-
-            PeriodicityField(
-                text = stringResource(R.string.PeriodicityInCount),
-                getValue = { getHabitState().periodicityCount },
-                onPeriodicityChange = onPeriodicityCountChange,
-                isCorrect = getPeriodicityCountIsCorrect
-            )
-        }
 
         PriorityField(
             getHabitState = getHabitState,
             onPriorityChange = onPriorityChange
         )
 
-        Text(
-            text = stringResource(R.string.HabitColor),
-            modifier = Modifier.padding(top = 20.dp)
-        )
-
         ColorChooser(
             getHabitState = getHabitState,
             getAllowedColor = getAllowedColor,
             onColorChange = onColorChange
-        )
-
-        Text(
-            text = stringResource(R.string.HabitType),
-            modifier = Modifier.padding(top = 20.dp)
         )
 
         TypeButtons(
@@ -201,6 +131,84 @@ private fun CreateHabitUI(
         getSaveButtonIsEnabled = getSaveButtonIsEnabled,
         onSaveHabit = onSaveHabit
     )
+}
+
+@Composable
+private fun Title() {
+    Text(
+        text = stringResource(R.string.CreateOrEditHabit),
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 15.dp),
+        fontSize = 28.sp
+    )
+}
+
+@Composable
+private fun NameField(
+    getHabitState: () -> CreateHabitState,
+    getNameIsCorrect: () -> Boolean,
+    onNameChange: (String) -> Unit
+) {
+    TextField(
+        value = getHabitState().name,
+        onValueChange = onNameChange,
+        label = { Text(text = stringResource(R.string.HabitName)) },
+        colors = TextFieldDefaults.colors(errorContainerColor = Color.Red),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        isError = !getNameIsCorrect()
+    )
+}
+
+
+@Composable
+fun DescriptionField(
+    getHabitState: () -> CreateHabitState,
+    onDescriptionChange: (String) -> Unit
+) {
+    TextField(
+        value = getHabitState().description,
+        label = { Text(text = stringResource(R.string.HabitDescription)) },
+        onValueChange = onDescriptionChange,
+        singleLine = false,
+        modifier = Modifier
+            .height(100.dp)
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+    )
+}
+
+@Composable
+private fun PeriodicityFields(
+    getHabitState: () -> CreateHabitState,
+    getPeriodicityCountIsCorrect: () -> Boolean,
+    getPeriodicityDaysCountIsCorrect: () -> Boolean,
+    onPeriodicityCountChange: (String) -> Unit,
+    onPeriodicityDaysCountChange: (String) -> Unit,
+) {
+    Text(
+        text = stringResource(R.string.Periodicity),
+        modifier = Modifier.padding(top = 15.dp)
+    )
+
+    Row {
+        PeriodicityField(
+            text = stringResource(R.string.PeriodicityInDays),
+            getValue = { getHabitState().periodicityDaysCount },
+            onPeriodicityChange = onPeriodicityDaysCountChange,
+            isCorrect = getPeriodicityDaysCountIsCorrect
+        )
+
+        PeriodicityField(
+            text = stringResource(R.string.PeriodicityInCount),
+            getValue = { getHabitState().periodicityCount },
+            onPeriodicityChange = onPeriodicityCountChange,
+            isCorrect = getPeriodicityCountIsCorrect
+        )
+    }
 }
 
 @Composable
@@ -262,42 +270,58 @@ private fun PriorityField(
         TextField(
             value = getHabitState().priority.name,
             onValueChange = {},
+            enabled = false,
             modifier = Modifier
                 .padding(top = 15.dp)
                 .clickable { expanded = !expanded },
-            label = { Text(stringResource(R.string.HabitPriority)) },
-            trailingIcon = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(
-                        if (!expanded)
-                            R.drawable.baseline_arrow_drop_down_24
-                        else
-                            R.drawable.baseline_arrow_drop_up_24
-                    ),
-                    contentDescription = "arror"
-                )
-            },
             colors = TextFieldDefaults.colors(
                 disabledTextColor = colorResource(id = R.color.TextField_TextColor)
             ),
-            enabled = false
+            label = { Text(stringResource(R.string.HabitPriority)) },
+            trailingIcon = { IconForDropdownMenu { expanded } }
         )
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            HabitPriority.entries.forEach {
-                DropdownMenuItem(
-                    text = {
-                        Text(text = it.toString())
-                    },
-                    onClick = {
-                        onPriorityChange(it)
-                        expanded = false
-                    }
-                )
-            }
+        DropdownPriorityMenu(
+            getExpended = { expanded },
+            hidingAction = { expanded = false },
+            onPriorityChange = onPriorityChange
+        )
+    }
+}
+
+@Composable
+private fun IconForDropdownMenu(
+    getExpended: () -> Boolean
+) {
+    Icon(
+        imageVector = ImageVector.vectorResource(
+            if (!getExpended())
+                R.drawable.baseline_arrow_drop_down_24
+            else
+                R.drawable.baseline_arrow_drop_up_24
+        ),
+        contentDescription = "arror"
+    )
+}
+
+@Composable
+private fun DropdownPriorityMenu(
+    getExpended: () -> Boolean,
+    hidingAction: () -> Unit,
+    onPriorityChange: (HabitPriority) -> Unit
+) {
+    DropdownMenu(
+        expanded = getExpended(),
+        onDismissRequest = hidingAction
+    ) {
+        HabitPriority.entries.forEach {
+            DropdownMenuItem(
+                text = { Text(text = it.toString()) },
+                onClick = {
+                    onPriorityChange(it)
+                    hidingAction()
+                }
+            )
         }
     }
 }
@@ -307,6 +331,11 @@ private fun TypeButtons(
     getHabitState: () -> CreateHabitState,
     onTypeChange: (HabitType) -> Unit
 ) {
+    Text(
+        text = stringResource(R.string.ChoseHabitType),
+        modifier = Modifier.padding(top = 20.dp)
+    )
+
     HabitType.entries.forEach {
         Row(
             modifier = Modifier
@@ -333,29 +362,46 @@ private fun ColorChooser(
     getAllowedColor: () -> List<Color>,
     onColorChange: (Color) -> Unit
 ) {
+    Text(
+        text = stringResource(R.string.HabitColor),
+        modifier = Modifier.padding(top = 20.dp)
+    )
+
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 15.dp)
     ) {
         items(getAllowedColor()) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .background(it)
-                    .clickable { onColorChange(it) }
-                    .size(40.dp)
-            ) {
-                if (it == getHabitState().color) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.round_done_36),
-                        tint = Color(75, 0, 130),
-                        contentDescription = "selected"
-                    )
-                }
-            }
-
+            ColorDrawer(
+                color = it,
+                getHabitState = getHabitState,
+                onColorChange = onColorChange
+            )
             Spacer(modifier = Modifier.width(20.dp))
+        }
+    }
+}
+
+@Composable
+private fun ColorDrawer(
+    color: Color,
+    getHabitState: () -> CreateHabitState,
+    onColorChange: (Color) -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .background(color)
+            .clickable { onColorChange(color) }
+            .size(40.dp)
+    ) {
+        if (color == getHabitState().color) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.round_done_36),
+                tint = Color(75, 0, 130),
+                contentDescription = "selected"
+            )
         }
     }
 }

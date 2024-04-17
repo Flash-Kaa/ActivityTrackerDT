@@ -122,8 +122,15 @@ private fun DrawerContent(
             fontSize = 28.sp
         )
 
-        TextButton(stringResource(R.string.habit_title), navigateToListOfHabitsAction)
-        TextButton(stringResource(R.string.info_title), navigateToInfoAction)
+        TextButton(
+            text = stringResource(R.string.Habit_title),
+            navigateAction = navigateToListOfHabitsAction
+        )
+
+        TextButton(
+            text = stringResource(R.string.Info_title),
+            navigateAction = navigateToInfoAction
+        )
     }
 }
 

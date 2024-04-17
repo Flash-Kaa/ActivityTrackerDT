@@ -1,5 +1,6 @@
 package com.flasshka.activitytrackerdt.models.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -33,4 +34,7 @@ interface Dao {
 
     @Query("SELECT * FROM HabitEntity")
     fun getHabits(): List<HabitEntity>
+
+    @Query("SELECT * FROM HabitEntity")
+    fun getHabitsWithLiveData(): LiveData<List<HabitEntity>>
 }

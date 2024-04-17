@@ -1,6 +1,7 @@
 package com.flasshka.activitytrackerdt.ui.habits
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -8,12 +9,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
@@ -31,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -47,6 +53,7 @@ import com.flasshka.activitytrackerdt.R
 import com.flasshka.activitytrackerdt.models.habit.Habit
 import com.flasshka.activitytrackerdt.models.habit.HabitType
 import com.flasshka.activitytrackerdt.ui.MainVM
+import kotlinx.coroutines.launch
 
 @Composable
 fun DrawerHabitsListWithBottomSheet(
@@ -111,6 +118,7 @@ private fun HabitsListWithBottomSheet(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Content(
     padding: PaddingValues,
@@ -119,35 +127,57 @@ private fun Content(
     changeIndexOfChosenFilterByHabitTypeAction: (Int) -> (() -> Unit),
     navigateToChangeHabitAction: (Long) -> (() -> Unit),
 ) {
+    val pagerState = rememberPagerState { HabitType.entries.size }
+    val scope = rememberCoroutineScope()
+
     Column {
         TextTabs(
+            pagerState = pagerState,
             getCurrentIndexOfChosenFilterByHabitType = getCurrentIndexOfChosenFilterByHabitType,
             changeIndexOfChosenFilterByHabitTypeAction = changeIndexOfChosenFilterByHabitTypeAction
         )
 
-        if (getSortedAndFilteredHabitList().isEmpty()) {
-            EmptyList()
-        } else {
-            LazyColumn(modifier = Modifier.padding(padding)) {
-                items(getSortedAndFilteredHabitList()) { habit ->
-                    HabitDrawer(habit, navigateToChangeHabitAction)
-                    DistanceBetweenHabits()
+        HorizontalPager(
+            state = pagerState,
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            changeIndexOfChosenFilterByHabitTypeAction(pagerState.targetPage).invoke()
+            if (getSortedAndFilteredHabitList().isEmpty()) {
+                EmptyList()
+            } else {
+                LazyColumn(
+                    modifier = Modifier.padding(padding)
+                ) {
+                    items(getSortedAndFilteredHabitList()) { habit ->
+                        HabitDrawer(habit, navigateToChangeHabitAction)
+                        DistanceBetweenHabits()
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TextTabs(
+    pagerState: PagerState,
     getCurrentIndexOfChosenFilterByHabitType: () -> Int,
     changeIndexOfChosenFilterByHabitTypeAction: (Int) -> (() -> Unit)
 ) {
+    val scope = rememberCoroutineScope()
+
     TabRow(getCurrentIndexOfChosenFilterByHabitType()) {
         HabitType.entries.forEachIndexed { index, itHabitType ->
             Tab(
                 selected = getCurrentIndexOfChosenFilterByHabitType() == index,
-                onClick = changeIndexOfChosenFilterByHabitTypeAction(index)
+                onClick = {
+                    changeIndexOfChosenFilterByHabitTypeAction(index).invoke()
+                    scope.launch {
+                        pagerState.animateScrollToPage(index)
+                    }
+                }
             ) {
                 Text(
                     text = itHabitType.toString(),
@@ -183,7 +213,7 @@ private fun SheetContent(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface
             ),
             label = {
-                Text(stringResource(R.string.findByName))
+                Text(text = stringResource(R.string.FindByName))
             },
             leadingIcon = {
                 Icon(
@@ -194,18 +224,18 @@ private fun SheetContent(
         )
 
         Spacer(modifier = Modifier.height(35.dp))
-        Text(text = stringResource(R.string.sortByDate))
+        Text(text = stringResource(R.string.SortByDate))
         Spacer(modifier = Modifier.height(15.dp))
 
         RowRadioButton(
-            text = stringResource(R.string.sortByOldestDate),
+            text = stringResource(R.string.SortByOldestDate),
             newValueSortHabitsByDateFromNew = true,
             getCurrentValueSortHabitsByDateFromNew = getCurrentValueSortHabitsByDateFromNew,
             sortFromNewAction = sortHabitsByDateFromNewAction
         )
 
         RowRadioButton(
-            text = stringResource(R.string.sortByNewDate),
+            text = stringResource(R.string.SortByNewDate),
             newValueSortHabitsByDateFromNew = false,
             getCurrentValueSortHabitsByDateFromNew = { !getCurrentValueSortHabitsByDateFromNew() },
             sortFromNewAction = sortHabitsByDateFromNewAction
@@ -302,18 +332,18 @@ private fun HabitDrawer(
             )
 
             Text(
-                text = "(${habit.periodicity})",
+                text = stringResource(id = R.string.InBrackets, habit.periodicity.toString()),
                 textAlign = TextAlign.End,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Text(
-                text = "${stringResource(id = R.string.HabitPriority)}: ${habit.priority}",
+                text = stringResource(id = R.string.HabitPriority, habit.priority.toString()),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Text(
-                text = "${stringResource(id = R.string.HabitType)}: ${habit.type}",
+                text = stringResource(id = R.string.HabitType, habit.type.toString()),
                 modifier = Modifier.fillMaxWidth()
             )
 

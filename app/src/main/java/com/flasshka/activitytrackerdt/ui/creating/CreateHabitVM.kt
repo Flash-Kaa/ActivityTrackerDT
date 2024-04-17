@@ -48,7 +48,7 @@ class CreateHabitVM(private val vm: MainVM) : ViewModel() {
 
     fun getHabitStateAction(id: Long?): () -> CreateHabitState {
         id?.let {
-            vm.habits.firstOrNull { it.id == id }?.let {
+            vm.getFirstOrNullWithId(id)?.let {
                 state = CreateHabitState(
                     id = it.id,
                     name = it.name,
@@ -64,7 +64,7 @@ class CreateHabitVM(private val vm: MainVM) : ViewModel() {
             }
         }
 
-        val nextId = if (vm.habits.isEmpty()) 0L else vm.habits.maxOf { it.id } + 1
+        val nextId = vm.getNextIndex()
 
         state = CreateHabitState(id = nextId)
 
