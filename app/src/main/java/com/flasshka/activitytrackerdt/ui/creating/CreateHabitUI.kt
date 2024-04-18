@@ -268,7 +268,7 @@ private fun PriorityField(
 
     Box {
         TextField(
-            value = getHabitState().priority.name,
+            value = getHabitState().priority.toString(),
             onValueChange = {},
             enabled = false,
             modifier = Modifier
@@ -277,7 +277,7 @@ private fun PriorityField(
             colors = TextFieldDefaults.colors(
                 disabledTextColor = colorResource(id = R.color.TextField_TextColor)
             ),
-            label = { Text(stringResource(R.string.HabitPriority)) },
+            label = { Text(stringResource(R.string.ChoseHabitType)) },
             trailingIcon = { IconForDropdownMenu { expanded } }
         )
 
