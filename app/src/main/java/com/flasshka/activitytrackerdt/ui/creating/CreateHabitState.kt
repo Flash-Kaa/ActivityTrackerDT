@@ -5,7 +5,7 @@ import com.flasshka.activitytrackerdt.models.habit.HabitPriority
 import com.flasshka.activitytrackerdt.models.habit.HabitType
 
 data class CreateHabitState(
-    val id: Long = -1,
+    val uid: String? = "",
     val name: String = "",
     val description: String = "",
     val priority: HabitPriority = HabitPriority.NONURGENT_AND_IMPORTANT,

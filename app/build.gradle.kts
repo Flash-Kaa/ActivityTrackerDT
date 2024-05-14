@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -9,6 +11,8 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        buildConfigField("String", "API_KEY", providers.gradleProperty("apikey").get())
+
         applicationId = "com.flasshka.activitytrackerdt"
         minSdk = 30
         targetSdk = 34
@@ -39,6 +43,8 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -57,6 +63,14 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
 
+    // Retrofit
+    val retrofitVersion = "2.9.0"
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-jackson:2.9.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:3.3.1")
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.0.1")
     implementation("androidx.navigation:navigation-compose:2.7.7")

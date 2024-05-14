@@ -11,7 +11,8 @@ import com.flasshka.activitytrackerdt.models.habit.HabitType
 
 @Entity
 data class HabitEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    val uid: String,
     val name: String,
     val description: String,
     val priority: Int,
@@ -19,11 +20,12 @@ data class HabitEntity(
     val periodicityCount: Int,
     val periodicityDays: Int,
     val color: Int,
-    val date: Long
+    val date: Long,
+    val doneDates: String
 ) {
     companion object {
-        fun Habit.toEntity() = HabitEntity(
-            id = id,
+        fun Habit.toDbEntity() = HabitEntity(
+            uid = uid,
             name = name,
             description = description,
             priority = priority.ordinal,
@@ -31,18 +33,20 @@ data class HabitEntity(
             periodicityCount = periodicity.count,
             periodicityDays = periodicity.days,
             color = color.toArgb(),
-            date = date
+            date = date,
+            doneDates = doneDates.joinToString(" ")
         )
     }
 
     fun toHabit() = Habit(
-        id = id,
+        uid = uid,
         name = name,
         description = description,
         priority = HabitPriority.entries[priority],
         type = HabitType.entries[type],
         periodicity = HabitPeriodicity(periodicityCount, periodicityDays),
         color = Color(color),
-        date = date
+        date = date,
+        doneDates = if (doneDates == "") listOf() else doneDates.split(" ").map { x -> x.toLong() }
     )
 }

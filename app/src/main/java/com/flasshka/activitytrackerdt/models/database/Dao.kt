@@ -10,18 +10,18 @@ interface Dao {
     @Insert(entity = HabitEntity::class)
     fun addHabit(entity: HabitEntity)
 
-    @Query("DELETE FROM HabitEntity WHERE id=:id")
-    fun deleteHabitById(id: Long)
+    @Query("DELETE FROM HabitEntity WHERE uid==:uid")
+    fun deleteHabitById(uid: String)
 
     @Query(
         "UPDATE HabitEntity " +
                 "SET name = :name, description = :description, priority = :priority, " +
                 "type = :type, periodicityCount = :periodicityCount, " +
                 "periodicityDays = :periodicityDays, color = :color, date = :date " +
-                "WHERE id == :id"
+                "WHERE uid == :uid"
     )
     fun updateHabit(
-        id: Long,
+        uid: String,
         name: String,
         description: String,
         priority: Int,

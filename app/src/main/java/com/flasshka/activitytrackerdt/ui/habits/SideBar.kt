@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.flasshka.activitytrackerdt.R
 import com.flasshka.activitytrackerdt.ui.MainVM
 import kotlinx.coroutines.CoroutineScope
@@ -43,20 +42,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun DrawerSideBar(
     vm: MainVM,
-    navController: NavController,
     content: @Composable (PaddingValues) -> Unit
 ) {
     SideBar(
-        navigateToInfoAction = vm.getNavigateToInfoAction(navController),
-        navigateToListOfHabitsAction = vm.getNavigateToListOfHabitsAction(navController),
+        getAction = vm::getAction,
         content = content
     )
 }
 
 @Composable
 private fun SideBar(
-    navigateToInfoAction: () -> Unit,
-    navigateToListOfHabitsAction: () -> Unit,
+    getAction: (HabitListActionType) -> (() -> Unit),
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -68,8 +64,7 @@ private fun SideBar(
         drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
         drawerContent = {
             DrawerContent(
-                navigateToInfoAction = navigateToInfoAction,
-                navigateToListOfHabitsAction = navigateToListOfHabitsAction
+                getAction = getAction
             )
         },
         backgroundColor = MaterialTheme.colorScheme.background,
@@ -108,8 +103,7 @@ private fun customDrawerShape(height: Float) = object : Shape {
 
 @Composable
 private fun DrawerContent(
-    navigateToInfoAction: () -> Unit,
-    navigateToListOfHabitsAction: () -> Unit
+    getAction: (HabitListActionType) -> (() -> Unit)
 ) {
     Column {
         Text(
@@ -122,14 +116,16 @@ private fun DrawerContent(
             fontSize = 28.sp
         )
 
+        Avatar()
+
         TextButton(
             text = stringResource(R.string.Habit_title),
-            navigateAction = navigateToListOfHabitsAction
+            navigateAction = getAction(HabitListActionType.NavigateToListOfHabits)
         )
 
         TextButton(
             text = stringResource(R.string.Info_title),
-            navigateAction = navigateToInfoAction
+            navigateAction = getAction(HabitListActionType.NavigateToInfo)
         )
     }
 }
