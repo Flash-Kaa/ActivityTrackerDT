@@ -22,17 +22,18 @@ class Repository(private val dao: Dao) {
 
     suspend fun update(habit: Habit) {
         withContext(Dispatchers.Default) {
-            with(habit) {
+            with(habit.toDbEntity()) {
                 dao.updateHabit(
                     uid = uid,
                     name = name,
                     description = description,
-                    priority = priority.ordinal,
-                    type = type.ordinal,
-                    periodicityCount = periodicity.count,
-                    periodicityDays = periodicity.days,
-                    color = color.toArgb(),
-                    date = date
+                    priority = priority,
+                    type = type,
+                    periodicityCount = periodicityCount,
+                    periodicityDays = periodicityDays,
+                    color = color,
+                    date = date,
+                    doneDates = doneDates
                 )
             }
         }

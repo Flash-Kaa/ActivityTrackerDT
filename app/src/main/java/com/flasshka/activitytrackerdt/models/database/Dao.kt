@@ -17,8 +17,8 @@ interface Dao {
         "UPDATE HabitEntity " +
                 "SET name = :name, description = :description, priority = :priority, " +
                 "type = :type, periodicityCount = :periodicityCount, " +
-                "periodicityDays = :periodicityDays, color = :color, date = :date " +
-                "WHERE uid == :uid"
+                "periodicityDays = :periodicityDays, color = :color, date = :date, " +
+                "doneDates = :doneDates WHERE uid == :uid"
     )
     fun updateHabit(
         uid: String,
@@ -29,7 +29,8 @@ interface Dao {
         periodicityCount: Int,
         periodicityDays: Int,
         color: Int,
-        date: Long
+        date: Long,
+        doneDates: String
     )
 
     @Query("SELECT * FROM HabitEntity")

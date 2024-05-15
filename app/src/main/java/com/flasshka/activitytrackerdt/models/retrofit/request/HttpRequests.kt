@@ -9,6 +9,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -31,7 +32,7 @@ interface HttpRequests {
         "Authorization: " + BuildConfig.API_KEY,
         "Content-Type: application/json"
     )
-    @DELETE("/api/habit")
+    @HTTP(method = "DELETE", path = "/api/habit", hasBody = true)
     fun deleteHabit(@Body requestBody: RequestBody): Call<ResponseBody>
 
     @Headers(

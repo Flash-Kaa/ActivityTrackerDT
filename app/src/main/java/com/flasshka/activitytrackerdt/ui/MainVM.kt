@@ -22,6 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class MainVM : ViewModel() {
     var habitNameFilter: String by mutableStateOf("")
@@ -35,6 +37,7 @@ class MainVM : ViewModel() {
 
     private lateinit var repository: Repository
     private lateinit var router: Router
+    lateinit var toast: Toast
 
     private val habits = MutableLiveData<MutableState<List<Habit>>>(mutableStateOf(listOf()))
 
@@ -107,6 +110,8 @@ class MainVM : ViewModel() {
 
             is HabitListActionType.UpdateFilter -> getUpdateHabitNameFilterAction(action.newValue)
             is HabitListActionType.SortByDate -> getSortHabitsByDateAction(action.fromNew)
+            is HabitListActionType.CompleteHabit -> getCompleteHabitAction(action.habit)
+            is HabitListActionType.DeleteHabit -> getDeleteHabitAction(action.habit)
         }
     }
 
@@ -120,7 +125,7 @@ class MainVM : ViewModel() {
                 val habitsFromWeb = Requests.getHabits()
 
                 delay(5000)
-                habits.value?.value?.let {  list ->
+                habits.value?.value?.let { list ->
                     // Загружаем на сервер данные из локальной бд, которых нет на сервере
                     list.filter { habitsFromWeb.any { habit -> habit.uid == it.uid }.not() }
                         .forEach {
@@ -157,4 +162,61 @@ class MainVM : ViewModel() {
 
     private fun getChangeIndexOfChosenType(index: Int): () -> Unit =
         { indexChosenFilterByHabitType = index }
+
+    private fun getDeleteHabitAction(habit: Habit): () -> Unit = {
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                repository.delete(habit.uid)
+                Requests.deleteHabit(habit)
+            }
+        }
+    }
+
+    private fun getCompleteHabitAction(habit: Habit): () -> Unit = {
+        val newHabit = habit.copy(
+            doneDates = habit.doneDates + listOf(
+                LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+            )
+        )
+
+        val startFrom = LocalDateTime.now()
+            .minusDays(newHabit.periodicity.days.toLong())
+            .toEpochSecond(ZoneOffset.UTC)
+
+        val remainsToComplete =
+            newHabit.periodicity.count - 1 - newHabit.doneDates.count { it >= startFrom }
+
+        if (newHabit.type == HabitType.GOOD) {
+            showToast(
+                remainsToComplete = remainsToComplete,
+                textIfTrue = "Ты потрясающий!",
+                textIfFalse = "Стоит выполнить еще $remainsToComplete раз"
+            )
+        } else {
+            showToast(
+                remainsToComplete = remainsToComplete,
+                textIfTrue = "Хватит это делать!",
+                textIfFalse = "Можете выполнить еще $remainsToComplete раз"
+            )
+        }
+
+        completeHabit(newHabit)
+    }
+
+    private fun completeHabit(habit: Habit) {
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                repository.update(habit)
+                Requests.doneHabit(habit)
+            }
+        }
+    }
+
+    private fun showToast(remainsToComplete: Int, textIfTrue: String, textIfFalse: String) {
+        if (remainsToComplete <= 0) {
+            toast.showToast(textIfTrue)
+        } else {
+            toast.showToast(textIfFalse)
+        }
+    }
 }

@@ -30,4 +30,7 @@
     <string name="SortByNewDate">Cначала новые</string>
     <string name="SortByOldestDate">Сначала старые</string>
     <string name="avatar_uri">https://img.goodfon.ru/original/3200x1800/f/1f/zemlya-planeta-kosmos-yarkaya.jpg</string>
+    <string name="complited">Выполнено</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
 </resources>

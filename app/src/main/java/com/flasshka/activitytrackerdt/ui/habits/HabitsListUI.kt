@@ -138,7 +138,6 @@ fun ListOfHabits(
     ) {
         items(sortedAndFilteredHabitList) { habit ->
             HabitDrawer(habit, getAction)
-            DistanceBetweenHabits()
         }
 
         item {
@@ -164,21 +163,5 @@ private fun EmptyList() {
             imageVector = ImageVector.vectorResource(R.drawable.baseline_arrow_downward_240),
             contentDescription = "arrow to create"
         )
-    }
-}
-
-@Composable
-private fun DistanceBetweenHabits() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.size(15.dp)
-    ) {
-        Canvas(modifier = Modifier) {
-            drawLine(
-                color = Color.Red,
-                Offset(Float.MIN_VALUE, 0f),
-                Offset(Float.MAX_VALUE, 0f)
-            )
-        }
     }
 }

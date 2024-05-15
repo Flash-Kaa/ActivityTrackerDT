@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.flasshka.activitytrackerdt.ui.creating.CreateHabitVM
 import com.flasshka.activitytrackerdt.ui.creating.FactoryForCreateVM
 import com.flasshka.activitytrackerdt.ui.navigation.MainNavGraph
@@ -21,6 +23,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mainVM.initRepository(applicationContext)
+        mainVM.toast = Toast(this)
+
+
+
         setContent {
             ActivityTrackerDTTheme {
                 Surface(

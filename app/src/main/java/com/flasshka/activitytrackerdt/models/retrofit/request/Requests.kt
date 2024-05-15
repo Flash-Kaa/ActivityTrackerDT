@@ -58,12 +58,14 @@ object Requests {
             return
         }
 
+        val entity = habit.toEntity()
+
         val requestBody = RequestBody.create(
             MediaType.parse("application/json"),
-            mapper.writeValueAsString(IdBody(habit.uid))
+            mapper.writeValueAsString(IdBody(entity.uid))
         )
-        val call = retrofit.putHabit(requestBody)
-        call.execute()
+
+        retrofit.deleteHabit(requestBody).execute()
     }
 
     suspend fun doneHabit(habit: Habit) {
@@ -71,18 +73,19 @@ object Requests {
             return
         }
 
+        val entity = habit.toEntity()
+
         val requestBody = RequestBody.create(
             MediaType.parse("application/json"),
-            mapper.writeValueAsString(IdBody(habit.uid))
+            mapper.writeValueAsString(HabitDoneEntity(entity.done_dates.last(), entity.uid))
         )
-        val call = retrofit.putHabit(requestBody)
-        call.execute()
+
+        retrofit.habitDone(requestBody).execute()
     }
 
     private fun isInternetAvailable(): Boolean {
         return try {
             val ipAddr = InetAddress.getByName("google.com")
-            //You can replace it with your name
             ipAddr.hostAddress != null
         } catch (e: Exception) {
             false

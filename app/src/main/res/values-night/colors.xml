@@ -4,4 +4,7 @@
     <color name="TextField_TextColor">#FFFAFA</color>
     <color name="ScaffoldBG">#3E3E3E</color>
     <color name="BottomSheetBG">#2F2F2F</color>
+
+    <color name="DescriptionBackground">#3F3F3F</color>
+    <color name="TagsWithShape">#3CB877</color>
 </resources>
