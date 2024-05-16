@@ -14,5 +14,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ActivityTrackerDT"
-include(":app")
- 
+include(":data")
+include(":presentation")
+include(":domain")
