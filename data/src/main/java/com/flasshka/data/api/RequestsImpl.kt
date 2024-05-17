@@ -1,15 +1,10 @@
 package com.flasshka.data.api
 
-import android.content.Context
-import androidx.lifecycle.ViewModel
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.flasshka.data.db.DbImpl
-import com.flasshka.data.repository.HttpRequests
+import com.flasshka.data.api.entities.HabitDoneEntity
+import com.flasshka.data.api.entities.HabitsListEntity.HabitsListEntityItem.Companion.toEntity
+import com.flasshka.data.api.entities.IdBody
 import com.flasshka.domain.entities.Habit
-import com.flasshka.domain.entities.api.HabitDoneEntity
-import com.flasshka.domain.entities.api.HabitsListEntity.HabitsListEntityItem.Companion.toEntity
-import com.flasshka.domain.entities.api.IdBody
-import dagger.Component
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -17,9 +12,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.InetAddress
 import javax.inject.Inject
-import javax.inject.Singleton
 
-class RequestsImpl @Inject constructor(){
+class RequestsImpl @Inject constructor() {
     companion object {
         val URL: String = "https://droid-test-server.doubletapp.ru/"
     }
@@ -34,7 +28,7 @@ class RequestsImpl @Inject constructor(){
     private val mapper: ObjectMapper = ObjectMapper()
     private val mediaType = MediaType.parse("application/json")
 
-    suspend fun getHabits(): List<Habit> {
+    fun getHabits(): List<Habit> {
         if (isInternetAvailable().not()) {
             return listOf()
         }
@@ -49,7 +43,7 @@ class RequestsImpl @Inject constructor(){
         return listOf()
     }
 
-    suspend fun putHabit(habit: Habit): String {
+    fun putHabit(habit: Habit): String {
         if (isInternetAvailable().not()) {
             return ""
         }
@@ -67,7 +61,7 @@ class RequestsImpl @Inject constructor(){
         return ""
     }
 
-    suspend fun deleteHabit(habit: Habit) {
+    fun deleteHabit(habit: Habit) {
         if (isInternetAvailable().not()) {
             return
         }
@@ -79,10 +73,10 @@ class RequestsImpl @Inject constructor(){
             mapper.writeValueAsString(IdBody(entity.uid))
         )
 
-        retrofit.deleteHabit(requestBody).execute()
+        retrofit.deleteHabit(requestBody)
     }
 
-    suspend fun doneHabit(habit: Habit) {
+    fun doneHabit(habit: Habit) {
         if (isInternetAvailable().not()) {
             return
         }
@@ -92,14 +86,14 @@ class RequestsImpl @Inject constructor(){
         val requestBody = RequestBody.create(
             mediaType,
             mapper.writeValueAsString(
-               HabitDoneEntity(
+                HabitDoneEntity(
                     entity.done_dates.last(),
                     entity.uid
                 )
             )
         )
 
-        retrofit.habitDone(requestBody).execute()
+        retrofit.habitDone(requestBody)
     }
 
     private fun isInternetAvailable(): Boolean {

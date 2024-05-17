@@ -3,17 +3,12 @@ package com.flasshka.data.db
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
-import com.flasshka.data.repository.AppDatabase
-import com.flasshka.data.repository.Dao
+import com.flasshka.data.db.entities.HabitEntity
+import com.flasshka.data.db.entities.HabitEntity.Companion.toDbEntity
 import com.flasshka.domain.entities.Habit
-import com.flasshka.domain.entities.db.HabitEntity
-import com.flasshka.domain.entities.db.HabitEntity.Companion.toDbEntity
-import dagger.Component
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-
 
 class DbImpl @Inject constructor() {
 

@@ -51,7 +51,7 @@ fun HabitDrawer(
     ) {
 
         Row(Modifier.fillMaxWidth()) {
-            ColorDrawer(color = habit.color)
+            ColorDrawer(color = Color(habit.color))
 
             Column {
                 Text(
@@ -89,7 +89,7 @@ fun HabitDrawer(
 fun ButtonRow(
     habit: com.flasshka.domain.entities.Habit,
     getAction: (HabitListActionType) -> (() -> Unit)
-){
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,7 +109,7 @@ fun ButtonRow(
             contentAlignment = Alignment.CenterEnd,
             modifier = Modifier
                 .fillMaxWidth()
-        ){
+        ) {
             Button(
                 onClick = { openDialog = true },
                 modifier = Modifier
@@ -124,8 +124,8 @@ fun ButtonRow(
 
         if (openDialog) {
             AlertDialog(
-                onDismissRequest = { openDialog = false }, 
-                confirmButton = { 
+                onDismissRequest = { openDialog = false },
+                confirmButton = {
                     Button(
                         onClick = {
                             openDialog = false

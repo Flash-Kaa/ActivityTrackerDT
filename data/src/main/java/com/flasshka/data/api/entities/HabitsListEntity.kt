@@ -1,7 +1,5 @@
-package com.flasshka.domain.entities.api
+package com.flasshka.data.api.entities
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.flasshka.domain.entities.Habit
 
 class HabitsListEntity : ArrayList<HabitsListEntity.HabitsListEntityItem>() {
@@ -26,7 +24,7 @@ class HabitsListEntity : ArrayList<HabitsListEntity.HabitsListEntityItem>() {
                 type = type.ordinal,
                 count = periodicity.count,
                 frequency = periodicity.days,
-                color = color.toArgb(),
+                color = color,
                 date = date.toInt(),
                 done_dates = doneDates.map { it.toInt() }
             )
@@ -39,7 +37,7 @@ class HabitsListEntity : ArrayList<HabitsListEntity.HabitsListEntityItem>() {
             priority = Habit.Priority.entries[priority],
             type = Habit.Type.entries[type],
             periodicity = Habit.Periodicity(count, frequency),
-            color = Color(color),
+            color = color,
             date = date.toLong(),
             doneDates = done_dates.map { it.toLong() }
         )

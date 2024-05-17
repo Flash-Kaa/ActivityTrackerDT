@@ -1,7 +1,5 @@
 package com.flasshka.domain.entities
 
-import androidx.compose.ui.graphics.Color
-
 data class Habit(
     val uid: String,
     val name: String,
@@ -9,7 +7,7 @@ data class Habit(
     val priority: Priority,
     val type: Type,
     val periodicity: Periodicity,
-    val color: Color,
+    val color: Int,
     val date: Long,
     val doneDates: List<Long>
 ) {

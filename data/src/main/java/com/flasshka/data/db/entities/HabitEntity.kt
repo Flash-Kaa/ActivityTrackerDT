@@ -1,7 +1,5 @@
-package com.flasshka.domain.entities.db
+package com.flasshka.data.db.entities
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.flasshka.domain.entities.Habit
@@ -29,7 +27,7 @@ data class HabitEntity(
             type = type.ordinal,
             periodicityCount = periodicity.count,
             periodicityDays = periodicity.days,
-            color = color.toArgb(),
+            color = color,
             date = date,
             doneDates = doneDates.joinToString(" ")
         )
@@ -42,7 +40,7 @@ data class HabitEntity(
         priority = Habit.Priority.entries[priority],
         type = Habit.Type.entries[type],
         periodicity = Habit.Periodicity(periodicityCount, periodicityDays),
-        color = Color(color),
+        color = color,
         date = date,
         doneDates = if (doneDates == "") listOf() else doneDates.split(" ").map { x -> x.toLong() }
     )

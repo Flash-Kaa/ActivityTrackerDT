@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.flasshka.domain.entities.Habit
@@ -54,7 +55,7 @@ class CreateHabitVM(private val mainVM: MainVM) : ViewModel() {
                     type = it.type,
                     periodicityCount = it.periodicity.count.toString(),
                     periodicityDaysCount = it.periodicity.days.toString(),
-                    color = it.color
+                    color = Color(it.color)
                 )
 
                 return { state }
@@ -138,7 +139,7 @@ class CreateHabitVM(private val mainVM: MainVM) : ViewModel() {
                 count = state.periodicityCount.toInt(),
                 days = state.periodicityDaysCount.toInt()
             ),
-            color = state.color,
+            color = state.color.toArgb(),
             date = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
             doneDates = listOf()
         )

@@ -1,11 +1,12 @@
-package com.flasshka.data.repository
+package com.flasshka.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.flasshka.data.db.entities.HabitEntity
 
 @Database(
     version = 1,
-    entities = [com.flasshka.domain.entities.db.HabitEntity::class]
+    entities = [HabitEntity::class]
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getDao(): Dao

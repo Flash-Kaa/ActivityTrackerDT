@@ -1,4 +1,4 @@
-package com.flasshka.domain.entities.api
+package com.flasshka.data.api.entities
 
 data class IdBody(
     val uid: String

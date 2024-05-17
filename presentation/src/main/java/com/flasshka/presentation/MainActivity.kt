@@ -1,6 +1,5 @@
 package com.flasshka.presentation
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,8 +12,6 @@ import com.flasshka.presentation.creating.CreateHabitVM
 import com.flasshka.presentation.creating.FactoryForCreateVM
 import com.flasshka.presentation.navigation.MainNavGraph
 import com.flasshka.presentation.ui.theme.ActivityTrackerDTTheme
-import dagger.Module
-import dagger.Provides
 
 class MainActivity : ComponentActivity() {
     private val mainVM: MainVM by viewModels()

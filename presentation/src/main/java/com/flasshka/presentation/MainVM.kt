@@ -14,14 +14,16 @@ import com.flasshka.data.DaggerDataComponent
 import com.flasshka.data.api.RequestsImpl
 import com.flasshka.data.db.DbImpl
 import com.flasshka.domain.entities.Habit
+import com.flasshka.domain.usecases.foreachIfNotContains
+import com.flasshka.domain.usecases.getCurrentTime
+import com.flasshka.domain.usecases.getTimeMinusDays
+import com.flasshka.domain.usecases.sortAndFilter
 import com.flasshka.presentation.habits.HabitListActionType
 import com.flasshka.presentation.navigation.Router
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 
 class MainVM : ViewModel() {
@@ -59,15 +61,11 @@ class MainVM : ViewModel() {
         habits.value?.value?.firstOrNull { it.uid == uid }
 
     fun getSortedAndFilteredHabitList(): List<Habit> {
-        val chosenFilterByHabitType = Habit.Type.entries[indexChosenFilterByHabitType]
-
-        return habits.value?.value?.let { list ->
-            list.filter {
-                it.type == chosenFilterByHabitType && it.name.contains(habitNameFilter, true)
-            }.sortedBy {
-                if (sortHabitsByDateFromOld) it.date else -it.date
-            }
-        } ?: emptyList()
+        return habits.value?.value?.sortAndFilter(
+            type = Habit.Type.entries[indexChosenFilterByHabitType],
+            name = habitNameFilter,
+            sortFromOld = sortHabitsByDateFromOld
+        ) ?: emptyList()
     }
 
     fun addOrUpdate(habit: Habit) {
@@ -137,17 +135,20 @@ class MainVM : ViewModel() {
                 delay(5000)
                 habits.value?.value?.let { list ->
                     // Загружаем на сервер данные из локальной бд, которых нет на сервере
-                    list.filter { habitsFromWeb.any { habit -> habit.uid == it.uid }.not() }
-                        .forEach {
+                    list.foreachIfNotContains(habitsFromWeb) {
+                        viewModelScope.launch(Dispatchers.Default) {
                             val res = api.putHabit(it.copy(uid = ""))
                             db.delete(it.uid)
                             db.addHabit(it.copy(uid = res))
                         }
+                    }
 
                     // Добавляем в локальную бд данные с сервера, которых нет в бд
-                    habitsFromWeb
-                        .filter { habits.value?.value?.any { habit -> habit.uid == it.uid } == false }
-                        .forEach { db.addHabit(it) }
+                    habitsFromWeb.foreachIfNotContains(list) {
+                        viewModelScope.launch(Dispatchers.Default) {
+                            db.addHabit(it)
+                        }
+                    }
                 }
             }
         }
@@ -185,13 +186,11 @@ class MainVM : ViewModel() {
     private fun getCompleteHabitAction(habit: Habit): () -> Unit = {
         val newHabit = habit.copy(
             doneDates = habit.doneDates + listOf(
-                LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+                getCurrentTime()
             )
         )
 
-        val startFrom = LocalDateTime.now()
-            .minusDays(newHabit.periodicity.days.toLong())
-            .toEpochSecond(ZoneOffset.UTC)
+        val startFrom = getTimeMinusDays(newHabit.periodicity.days)
 
         val remainsToComplete =
             newHabit.periodicity.count - 1 - newHabit.doneDates.count { it >= startFrom }
