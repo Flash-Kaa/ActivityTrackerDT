@@ -63,7 +63,7 @@ class MainVM : ViewModel() {
     fun getSortedAndFilteredHabitList(): List<Habit> {
         return habits.value?.value?.sortAndFilter(
             type = Habit.Type.entries[indexChosenFilterByHabitType],
-            name = habitNameFilter,
+            containInName = habitNameFilter,
             sortFromOld = sortHabitsByDateFromOld
         ) ?: emptyList()
     }

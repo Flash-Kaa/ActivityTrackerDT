@@ -9,8 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.flasshka.domain.entities.Habit
+import com.flasshka.presentation.TestTags
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -35,7 +37,13 @@ fun TypeTabs(
             ) {
                 Text(
                     text = itHabitType.toString(),
-                    modifier = Modifier.padding(5.dp)
+                    modifier = Modifier
+                        .testTag(
+                            if (itHabitType == Habit.Type.GOOD)
+                                TestTags.GOOD_LIST .toString()
+                            else
+                                TestTags.BAD_LIST.toString())
+                        .padding(5.dp)
                 )
             }
         }

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flasshka.presentation.R
+import com.flasshka.presentation.TestTags
 
 @Composable
 fun HabitDrawer(
@@ -113,6 +115,7 @@ fun ButtonRow(
             Button(
                 onClick = { openDialog = true },
                 modifier = Modifier
+                    .testTag(TestTags.DELETE_BUTTON.toString())
                     .padding(10.dp)
             ) {
                 Icon(
@@ -127,6 +130,7 @@ fun ButtonRow(
                 onDismissRequest = { openDialog = false },
                 confirmButton = {
                     Button(
+                        modifier = Modifier.testTag(TestTags.DONE_DELETE_BUTTON.toString()),
                         onClick = {
                             openDialog = false
                             getAction(HabitListActionType.DeleteHabit(habit)).invoke()

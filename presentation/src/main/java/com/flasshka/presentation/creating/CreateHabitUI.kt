@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -13,12 +14,14 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flasshka.presentation.R
+import com.flasshka.presentation.TestTags
 
 @Composable
 fun DrawCreateHabitUI(
@@ -48,45 +51,59 @@ private fun CreateHabitUI(
     getSaveButtonIsEnabled: () -> Boolean,
     getAction: (CreateHabitActionType) -> (() -> Unit)
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier.padding(10.dp),
     ) {
-        Title()
+        item {
+            Title()
+        }
 
-        NameField(
-            getHabitState = getHabitState,
-            getNameIsCorrect = getNameIsCorrect,
-            getAction = getAction
-        )
+        item {
+            NameField(
+                getHabitState = getHabitState,
+                getNameIsCorrect = getNameIsCorrect,
+                getAction = getAction
+            )
+        }
 
-        DescriptionField(
-            getHabitState = getHabitState,
-            getDescriptionIsCorrect = getDescriptionIsCorrect,
-            getAction = getAction
-        )
+        item {
+            DescriptionField(
+                getHabitState = getHabitState,
+                getDescriptionIsCorrect = getDescriptionIsCorrect,
+                getAction = getAction
+            )
+        }
 
-        PeriodicityFields(
-            getHabitState = getHabitState,
-            getPeriodicityCountIsCorrect = getPeriodicityCountIsCorrect,
-            getPeriodicityDaysCountIsCorrect = getPeriodicityDaysCountIsCorrect,
-            getAction = getAction
-        )
+        item {
+            PeriodicityFields(
+                getHabitState = getHabitState,
+                getPeriodicityCountIsCorrect = getPeriodicityCountIsCorrect,
+                getPeriodicityDaysCountIsCorrect = getPeriodicityDaysCountIsCorrect,
+                getAction = getAction
+            )
+        }
 
-        PriorityField(
-            getHabitState = getHabitState,
-            getAction = getAction
-        )
+        item {
+            PriorityField(
+                getHabitState = getHabitState,
+                getAction = getAction
+            )
+        }
 
-        ColorChooser(
-            getHabitState = getHabitState,
-            colors = colors,
-            getAction = getAction
-        )
+        item {
+            ColorChooser(
+                getHabitState = getHabitState,
+                colors = colors,
+                getAction = getAction
+            )
+        }
 
-        TypeButtons(
-            getHabitState = getHabitState,
-            getAction = getAction
-        )
+        item {
+            TypeButtons(
+                getHabitState = getHabitState,
+                getAction = getAction
+            )
+        }
     }
 
     SaveButton(
@@ -121,6 +138,7 @@ private fun NameField(
         label = { Text(text = stringResource(R.string.HabitName)) },
         colors = TextFieldDefaults.colors(errorContainerColor = Color.Red),
         modifier = Modifier
+            .testTag(TestTags.NAME_FIELD.toString())
             .fillMaxWidth()
             .padding(vertical = 10.dp),
         isError = !getNameIsCorrect()
@@ -144,6 +162,7 @@ private fun DescriptionField(
         singleLine = false,
         colors = TextFieldDefaults.colors(errorContainerColor = Color.Red),
         modifier = Modifier
+            .testTag(TestTags.DESCR_FIELD.toString())
             .height(100.dp)
             .fillMaxWidth()
             .padding(vertical = 10.dp),
@@ -167,6 +186,7 @@ private fun PeriodicityFields(
             text = stringResource(R.string.PeriodicityInDays),
             getValue = { getHabitState().periodicityDaysCount },
             isCorrect = getPeriodicityDaysCountIsCorrect,
+            modifier = Modifier.testTag(TestTags.PERIOD_DAYS_FIELD.toString()),
             onValueChange = {
                 getAction(CreateHabitActionType.OnPeriodicityDaysCountChange(it)).invoke()
             }
@@ -176,6 +196,7 @@ private fun PeriodicityFields(
             text = stringResource(R.string.PeriodicityInCount),
             getValue = { getHabitState().periodicityCount },
             isCorrect = getPeriodicityCountIsCorrect,
+            modifier = Modifier.testTag(TestTags.PERIOD_COUNT_FIELD.toString()),
             onValueChange = {
                 getAction(CreateHabitActionType.OnPeriodicityCountChange(it)).invoke()
             }
@@ -186,6 +207,7 @@ private fun PeriodicityFields(
 @Composable
 private fun PeriodicityField(
     text: String,
+    modifier: Modifier = Modifier,
     getValue: () -> String,
     isCorrect: () -> Boolean,
     onValueChange: (String) -> Unit
@@ -194,7 +216,7 @@ private fun PeriodicityField(
         value = getValue(),
         label = { Text(text) },
         onValueChange = onValueChange,
-        modifier = Modifier
+        modifier = modifier
             .padding(10.dp)
             .width(150.dp),
         isError = !isCorrect(),

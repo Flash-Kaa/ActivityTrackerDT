@@ -3,20 +3,10 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="MainActivity">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="adb-b2d654aa-8mPz4Q._adb-tls-connect._tcp" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-17T07:53:35.263655425Z" />
-        </State>
+        <State />
+      </entry>
+      <entry key="UiTest">
+        <State />
       </entry>
       <entry key="app">
         <State>
@@ -46,7 +36,13 @@
       <entry key="app.presentation">
         <State />
       </entry>
+      <entry key="create habit()">
+        <State />
+      </entry>
       <entry key="data">
+        <State />
+      </entry>
+      <entry key="delete habit()">
         <State />
       </entry>
       <entry key="domain">

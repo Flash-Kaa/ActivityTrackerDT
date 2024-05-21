@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flasshka.presentation.MainVM
 import com.flasshka.presentation.R
+import com.flasshka.presentation.TestTags
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -120,11 +122,13 @@ private fun DrawerContent(
 
         TextButton(
             text = stringResource(R.string.Habit_title),
+            modifier = Modifier.testTag(TestTags.OPEN_LIST_BUTTON.toString()),
             navigateAction = getAction(HabitListActionType.NavigateToListOfHabits)
         )
 
         TextButton(
             text = stringResource(R.string.Info_title),
+            modifier = Modifier.testTag(TestTags.OPEN_INFO_BUTTON.toString()),
             navigateAction = getAction(HabitListActionType.NavigateToInfo)
         )
     }
@@ -133,12 +137,13 @@ private fun DrawerContent(
 @Composable
 private fun TextButton(
     text: String,
+    modifier: Modifier = Modifier,
     navigateAction: () -> Unit
 ) {
     Text(
         text = text,
         fontSize = 24.sp,
-        modifier = Modifier
+        modifier = modifier
             .background(colorResource(id = R.color.ScaffoldBG))
             .clickable(onClick = navigateAction)
             .fillMaxWidth()
@@ -159,6 +164,7 @@ fun TopAppBarDrawer(
         },
         navigationIcon = {
             IconButton(
+                modifier = Modifier.testTag(TestTags.OPEN_SIDE_BAR_BUTTON.toString()),
                 onClick = {
                     scope.launch {
                         scaffoldState.drawerState.open()

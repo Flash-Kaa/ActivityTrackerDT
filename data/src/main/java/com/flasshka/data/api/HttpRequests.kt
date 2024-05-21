@@ -4,6 +4,7 @@ import com.flasshka.data.BuildConfig
 import com.flasshka.data.api.entities.HabitsListEntity
 import com.flasshka.data.api.entities.IdBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,7 +32,7 @@ interface HttpRequests {
         "Content-Type: application/json"
     )
     @HTTP(method = "DELETE", path = "/api/habit", hasBody = true)
-    fun deleteHabit(@Body requestBody: RequestBody)
+    fun deleteHabit(@Body requestBody: RequestBody): Call<ResponseBody> // can't return void
 
     @Headers(
         "accept: application/json",
@@ -39,5 +40,5 @@ interface HttpRequests {
         "Content-Type: application/json"
     )
     @POST("/api/habit_done")
-    fun habitDone(@Body requestBody: RequestBody)
+    fun habitDone(@Body requestBody: RequestBody): Call<ResponseBody> // can't return void
 }

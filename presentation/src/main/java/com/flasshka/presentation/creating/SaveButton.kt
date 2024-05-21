@@ -12,9 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.flasshka.presentation.R
+import com.flasshka.presentation.TestTags
 
 @Composable
 fun SaveButton(
@@ -27,6 +29,7 @@ fun SaveButton(
     ) {
         Button(
             modifier = Modifier
+                .testTag(TestTags.SAVE_BUTTON.toString())
                 .padding(10.dp)
                 .size(80.dp),
             shape = RoundedCornerShape(40.dp),

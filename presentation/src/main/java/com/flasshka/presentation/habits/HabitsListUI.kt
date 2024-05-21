@@ -90,7 +90,7 @@ private fun HabitsListWithBottomSheet(
 private fun HorizontalPage(
     padding: PaddingValues,
     indexOfChosenFilterByHabitType: Int,
-    sortedAndFilteredHabitList: List<com.flasshka.domain.entities.Habit>,
+    sortedAndFilteredHabitList: List<Habit>,
     getAction: (HabitListActionType) -> (() -> Unit)
 ) {
     val pagerState = rememberPagerState { Habit.Type.entries.size }

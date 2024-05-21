@@ -73,7 +73,7 @@ class RequestsImpl @Inject constructor() {
             mapper.writeValueAsString(IdBody(entity.uid))
         )
 
-        retrofit.deleteHabit(requestBody)
+        retrofit.deleteHabit(requestBody).execute()
     }
 
     fun doneHabit(habit: Habit) {
@@ -93,7 +93,7 @@ class RequestsImpl @Inject constructor() {
             )
         )
 
-        retrofit.habitDone(requestBody)
+        retrofit.habitDone(requestBody).execute()
     }
 
     private fun isInternetAvailable(): Boolean {
